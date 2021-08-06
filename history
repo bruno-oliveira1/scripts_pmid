@@ -1,0 +1,87 @@
+https://cloud.google.com/sdk/gcloud/reference/auth/login
+
+https://blog.buckaway.name/in-wsl2-the-linux-files-are-stored-in-a-container-fc005e1e924f
+
+https://cloud.google.com/sdk/docs/install#deb
+
+https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+
+https://docs.microsoft.com/en-us/windows/wsl/install-win10
+
+
+o select an already authenticated account to use.
+ERROR: (gcloud.container.clusters.get-credentials) You do not currently have an active account selected.
+Please run:
+
+  $ gcloud auth login
+
+to obtain new credentials.
+
+If you have already logged in with a different account:
+
+    $ gcloud config set account ACCOUNT
+
+to select an already authenticated account to use.
+Você entrou no cluster FQA
+root@ENGNB002798:/home/bruno# gcloud auth login
+Go to the following link in your browser:
+
+    https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=32555940559.apps.googleusercontent.com&redirect_uri=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob&scope=openid+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platform+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fappengine.admin+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcompute+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Faccounts.reauth&state=1WLCuxrxV0HA2EsA1XCKzkpty8R0Z3&prompt=consent&access_type=offline&code_challenge=jhqMQLH3VQ6eYf4BGIkskoArcnENLvpLOIFqeeoY3lU&code_challenge_method=S256
+
+Enter verification code: 4/1AX4XfWi3PHITRLUH8HpyDSUqFthk_vlkEiExYgZIGQQhP9v75wFVaRYnYXI
+
+You are now logged in as [bruno.oliveira2@engdb.com.br].
+Your current project is [tim-pmid-fqa].  You can change this setting by running:
+
+    1  apt-get update 
+    2  apt-get upgrade -y
+    3  apt-get install -y vim
+    4  apt-get install -y 
+    5  apt-cache search completion
+    6  apt-cache search completion | grep bash
+    7  apt-get install -y bash-completion 
+    8  apt-get install -y dos2unix
+    9  apt-get install -y kubernets
+   10  apt-get install -y kubernetcurl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"s
+   11  apt-get install -y curl
+   12  apt-get install -y kubernetcurl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"s
+   13  curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+   14  curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+   15  echo "$(<kubectl.sha256) kubectl" | sha256sum --check
+   16  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+   17  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+   18  kubectl -n uat logs -f orch-r-eligible-customer-v1-7945c4b6bf-hw2z9 | less
+   19  echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+   20  sudo apt-get install apt-transport-https ca-certificates gnupg
+   21  echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+   22  curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+   23  sudo apt-get update && sudo apt-get install google-cloud-sdk
+   24  sudo apt-get update && sudo apt-get install google-cloud-sdk
+   25  sudo apt-get install apt-transport-https ca-certificates gnupg
+   26  apt-get install apt-transport-https ca-certificates gnupg
+   27  rm -rf /etc/apt/sources.list.d/google-cloud-sdk.list 
+   28  sudo apt-get update && sudo apt-get install google-cloud-sdk
+   29  echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+   30  sudo apt-get install apt-transport-https ca-certificates gnupg
+   31  curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+   32  sudo apt-get update && sudo apt-get install google-cloud-sdk
+   33  kubectl -n uat logs -f orch-r-eligible-customer-v1-7945c4b6bf-hw2z9 | less
+   34  ls
+   35  pwd
+   36  cd c/
+   37  ls
+   38  vim changeenv.sh
+   39  vim changeEnv.sh
+   40  explorer.exe .
+   41  df -h
+   42  copy /mnt/c/Users/Administrador/scriptspmid/*.sh . 
+   43  cp /mnt/c/Users/Administrador/scriptspmid/*.sh . 
+   44  ls
+   45  chmod +x *.sh
+   46  ./changeEnv.sh fqa
+   47  dos2unix *.sh
+   48  ./changeEnv.sh fqa
+   49  gcloud auth login
+   50  ./changeEnv.sh fqa
+   51  kubectl -n uat logs -f orch-r-eligible-customer-v1-7945c4b6bf-hw2z9 | less
+   52  history > history
