@@ -1,1 +1,4 @@
-uat3
+###### Arquivo exemplo ###########
+#Nele só é possível ter um nome de ambiente que pode ser:
+
+Ex: uat, uat2, uat3, UAT, UAT2, UAT3
