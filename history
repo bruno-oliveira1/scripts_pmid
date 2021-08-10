@@ -1,12 +1,51 @@
-https://cloud.google.com/sdk/gcloud/reference/auth/login
+#Referencia
 
-https://blog.buckaway.name/in-wsl2-the-linux-files-are-stored-in-a-container-fc005e1e924f
+#Execute
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
 
-https://cloud.google.com/sdk/docs/install#deb
+#Reinicie o computador
 
-https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+#Instale
+https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi
 
+#Execute
+wsl --set-default-version 2
+
+#Para mais detalhes
 https://docs.microsoft.com/en-us/windows/wsl/install-win10
+
+#Abra a microsoft store e baixe o Debian
+https://www.microsoft.com/pt-br/p/debian/9msvkqc78pk6?rtc=1&activetab=pivot:overviewtab
+
+#Abre o app Debian e defina uma senha
+
+#Após abrir finalizar abra o Debian 
+#Digite sudo su digite a senha 
+
+#Os comandos abaixo tem que ser executados como root (Após sudo su)
+
+#Depois execute
+apt-get update 
+apt-get upgrade -y
+apt-get install -y vim bash-completion dos2unix curl apt-transport-https ca-certificates gnupg
+
+#Instale o kubectl
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+echo "$(<kubectl.sha256) kubectl" | sha256sum --check
+install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+#Instale o GCP
+echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+apt-get update && apt-get install google-cloud-sdk
+
+
+
+
+
+
 
 
 o select an already authenticated account to use.
@@ -33,38 +72,7 @@ Enter verification code: 4/1AX4XfWi3PHITRLUH8HpyDSUqFthk_vlkEiExYgZIGQQhP9v75wFV
 You are now logged in as [bruno.oliveira2@engdb.com.br].
 Your current project is [tim-pmid-fqa].  You can change this setting by running:
 
-    1  apt-get update 
-    2  apt-get upgrade -y
-    3  apt-get install -y vim
-    4  apt-get install -y 
-    5  apt-cache search completion
-    6  apt-cache search completion | grep bash
-    7  apt-get install -y bash-completion 
-    8  apt-get install -y dos2unix
-    9  apt-get install -y kubernets
-   10  apt-get install -y kubernetcurl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"s
-   11  apt-get install -y curl
-   12  apt-get install -y kubernetcurl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"s
-   13  curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-   14  curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
-   15  echo "$(<kubectl.sha256) kubectl" | sha256sum --check
-   16  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-   17  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-   18  kubectl -n uat logs -f orch-r-eligible-customer-v1-7945c4b6bf-hw2z9 | less
-   19  echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-   20  sudo apt-get install apt-transport-https ca-certificates gnupg
-   21  echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-   22  curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
-   23  sudo apt-get update && sudo apt-get install google-cloud-sdk
-   24  sudo apt-get update && sudo apt-get install google-cloud-sdk
-   25  sudo apt-get install apt-transport-https ca-certificates gnupg
-   26  apt-get install apt-transport-https ca-certificates gnupg
-   27  rm -rf /etc/apt/sources.list.d/google-cloud-sdk.list 
-   28  sudo apt-get update && sudo apt-get install google-cloud-sdk
-   29  echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-   30  sudo apt-get install apt-transport-https ca-certificates gnupg
-   31  curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
-   32  sudo apt-get update && sudo apt-get install google-cloud-sdk
+  18  kubectl -n uat logs -f orch-r-eligible-customer-v1-7945c4b6bf-hw2z9 | less
    33  kubectl -n uat logs -f orch-r-eligible-customer-v1-7945c4b6bf-hw2z9 | less
    34  ls
    35  pwd
@@ -84,4 +92,20 @@ Your current project is [tim-pmid-fqa].  You can change this setting by running:
    49  gcloud auth login
    50  ./changeEnv.sh fqa
    51  kubectl -n uat logs -f orch-r-eligible-customer-v1-7945c4b6bf-hw2z9 | less
-   52  history > history
+
+
+
+#Fontes
+#Instalar WSL
+https://docs.microsoft.com/en-us/windows/wsl/install-win10
+
+#Instalar Debian
+https://www.microsoft.com/pt-br/p/debian/9msvkqc78pk6?rtc=1&activetab=pivot:overviewtab
+
+#Instalar GCP
+
+
+https://cloud.google.com/sdk/gcloud/reference/auth/login
+https://blog.buckaway.name/in-wsl2-the-linux-files-are-stored-in-a-container-fc005e1e924f
+https://cloud.google.com/sdk/docs/install#deb
+https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
