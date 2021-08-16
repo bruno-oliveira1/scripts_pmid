@@ -26,13 +26,13 @@ else
 	namespace=$(sed -e 's/uta1/uat/g' -e 's/aut1/uat/g' -e 's/tua1/uat/g' <<< $namespace)
 		 
 case $namespace in
-	uta2|uta3) 
+	uta|uta2|uta3) 
 		namespace=$(sed 's/uta/uat/g' <<< $namespace)
 		;;	
-	tua2|tua3) 
+	tua|tua2|tua3) 
 		namespace=$(sed 's/tua/uat/g' <<< $namespace)
 		;;
-	aut2|aut3) 
+	aut|aut2|aut3) 
 		namespace=$(sed 's/aut/uat/g' <<< $namespace)
 		;;
 	*)
