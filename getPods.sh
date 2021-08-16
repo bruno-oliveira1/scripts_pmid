@@ -11,7 +11,6 @@ then
 	read -r namespace<namespace.txt
 else
 	namespace=$(echo "$2" | awk '{print tolower($0)}')
-	namespace=$(sed -e 's/uta1/uat/g' -e 's/aut1/uat/g' -e 's/tua1/uat/g' <<< $namespace)
 		 
 case $namespace in
 	uta|uta2|uta3) 
@@ -22,6 +21,12 @@ case $namespace in
 		;;
 	aut|aut2|aut3) 
 		namespace=$(sed 's/aut/uat/g' <<< $namespace)
+		;;
+	uta1|tua1|aut1)
+		namespace=$(sed -e 's/uta1/uat/g' -e 's/aut1/uat/g' -e 's/tua1/uat/g' <<< $namespace)
+		;;
+	uat|uat2|uat3|prd|dev)
+		echo "Um momento ..."
 		;;
 	*)
 		echo "Ambiente nao informado - Ex: uat, uat2, prd etc ..." 
