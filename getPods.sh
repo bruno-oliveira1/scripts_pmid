@@ -22,21 +22,29 @@ if [ -z $2 ]
 then
 	read -r namespace<namespace.txt
 else
-namespace=$2
+	namespace=$(echo "$2" | awk '{print tolower($0)}')
+	namespace=$(sed -e 's/uta1/uat/g' -e 's/aut1/uat/g' -e 's/tua1/uat/g' <<< $namespace)
+		 
+case $namespace in
+	uta2|uta3) 
+		namespace=$(sed 's/uta/uat/g' <<< $namespace)
+		;;	
+	tua2|tua3) 
+		namespace=$(sed 's/tua/uat/g' <<< $namespace)
+		;;
+	aut2|aut3) 
+		namespace=$(sed 's/aut/uat/g' <<< $namespace)
+		;;
+	*)
+		echo "Ambiente nao informado - Ex: uat, uat2, prd etc ..." 
+esac
+
 fi
-pod=$1
+
+pod=$(echo "$1" | awk '{print tolower($0)}')
 
 getPods (){
 kubectl get pods -A | grep $namespace | grep $pod
 }
 
 getPods $pod $namespace
-
-if [ $? -eq 0 ]
-then
-		echo ""
-else
-		echo ""
-		echo "Utilize o script conforme o exemplo: . getPods.sh u-billing-profile-info uat2"
-		echo ""
-fi
