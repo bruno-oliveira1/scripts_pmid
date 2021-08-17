@@ -21,18 +21,37 @@ echo ""
 echo Restart do logstash feito >> /nmws_app/cmd/teste.log
 }
 
+stop_start_elastic () {
+diretorio=$(ls -d /domain/ELK/elastic/elasticsearch-* | sort | tail -1)
+binario=$(echo $diretorio/bin/elasticsearch)
+processo=`ps -ef | grep $diretorio | grep -v grep | awk '{print $2}'`
+for line in $processo
+do
+        kill -9 $line
+done
+
+processo=`ps -ef | grep $diretorio | grep -v grep | awk '{print $2}'`
+if [ "$processo" == "" ];
+then
+        $binario -d -p $diretorio/pid
+else
+        for line in $processo
+        do
+                kill -9 $line
+        done
+
+        sleep 5
+
+        $binario -d -p $diretorio/pid
+fi
+}
+
 sr_elastic () {
-cd $(ls -d /domain/ELK/elastic/elasticsearch-* | sort | tail -1)
-./stop_elastic.sh
-echo ""
-echo Stop do elastic feito >> /domain/ELK/elastic/cmd/teste.log
-./restart_elastic.sh &
-echo ""
-echo Restart do elastic feito >> /domain/ELK/elastic/cmd/teste.log
+stop_start_elastic
 sleep 120
-#curl -XPUT -H "Content-Type: application/json" http://snelnxr70:9200/_all/_settings -d '{"index.blocks.read_only_allow_delete": false}' >> /domain/ELK/elastic/cmd/teste.log
-curl -XPUT -H "Content-Type: application/json" http://snelnxr70:9200/*/_settings -d '{"index.blocks.read_only_allow_delete": false}' >> /domain/ELK/elastic/cmd/teste.log
-echo curl executado >> /domain/ELK/elastic/cmd/teste.log
+curl -XPUT -H "Content-Type: application/json" http://snelnxr70:9200/_all/_settings -d '{"index.blocks.read_only_allow_delete": false}' >> $diretorio/logs/teste.log
+curl -XPUT -H "Content-Type: application/json" http://snelnxr70:9200/*/_settings -d '{"index.blocks.read_only_allow_delete": false}' >> $diretorio/logs/teste.log
+echo curl executado >> $diretorio/logs/teste.log
 }
 
 case $user in

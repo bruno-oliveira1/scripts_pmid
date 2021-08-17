@@ -2,37 +2,23 @@
 #
 # checkVersion.sh - Checa a versão do serviço no ambiente.
 #
-# Como usar: ". checkVersion.sh nome-do-pod-v1 ambiente" para checar a versão no ambiente.
-#
-# Exemplo:
-#       felipe_alencar@cloudshell:~$ . checkVersion.sh bscsix-read-simcard-data-v1 uat2
-#
-# Obs: Deve-se considerar apenas os 3 primeiros digitos, pois o ultimo digito é usado pela fabrica.
-#
-# Histórico de versões:
-#       Versão: 1.0
-#             Autor: Felipe de Carvalho Alencar <felipe.alencar@engdb.com.br>
-#             Data: 01/2021
-#             Descrição: Primeira versão.
+#Baseado no trabalho de Felipe de Carvalho Alencar <felipe.alencar@engdb.com.br>
+#Migrado para gitlab e alterações feitas por Bruno Oliveira <bruno.oliveira2@engdb.com.br>
 
-if [ -z $2 ] 
-then
-	read -r namespace<namespace.txt
+if [ -z $2 ]; then
+	if [ -f namespace.txt ]; then
+		read -r namespace<namespace.txt
+	else
+		echo "Ambiente nao informado e arquivo namespace.txt nao existe"
+		exit 1
+	fi
 else
-namespace=$2
-fi
-pod=$1
+	namespace=$(echo "$2" | awk '{print tolower($0)}')
+	pod=$(echo "$1" | awk '{print tolower($0)}')
+	fi
 
 checkVersion (){
 kubectl -n $namespace describe deploy $pod | grep -i Image
 }
 
 checkVersion $pod $namespace
-if [ $? -eq 0 ]
-then
-        echo ""
-else
-        echo ""
-		echo "Utilize o script conforme o exemplo: . checkVersion.sh bscsix-read-simcard-data-v1 uat2"
-		echo ""
-fi
