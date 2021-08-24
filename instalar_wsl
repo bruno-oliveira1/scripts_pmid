@@ -1,6 +1,8 @@
 #Referencia
 
-#Execute
+#Antes de começar certifique-se que não tem nenhum programa de virtualização instalado no seu PC (Hyper-V, VirtualBox, VMWare, QEMU, etc...)
+
+#Execute no powershell como admin 
 dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
 dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
 
@@ -92,6 +94,11 @@ Será pedido para informar uma passphrase que é uma senha para decriptar a chav
 
 #Veja o conteudo da chave e copie    
 cat .ssh/id_rsa.pub
+
+#Acesse
+https://gitlab.engdb.com.br/profile/keys
+
+#Cole sua chave SSH e salve
 
 #Crie o arquivo config 
 vim .ssh/config
