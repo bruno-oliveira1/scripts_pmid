@@ -113,3 +113,17 @@ ssh -T git@gitlab.engdb.com.br
 
 ####Para mais info 
 https://docs.gitlab.com/ce/ssh/index.html
+
+#Para baixar os scripts do PMID faça (No diretório home do usuário Ex: /home/bruno/)
+git clone git@gitlab.engdb.com.br:bdasilvaol/scripts.git
+
+#Adicionar scripts ao PATH
+#Edite o arquivo .bashrc
+export PATH="$HOME/scripts:$PATH"
+
+#Adicionar o seu diretório home do Windows ao Linux
+homewin="/mnt/c/Users/seuusuariowindows"
+#Ex: homewin="/mnt/c/Users/Administrador"
+
+#Depois para aplicar as alterações
+source .bashrc
