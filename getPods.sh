@@ -25,8 +25,8 @@ else
 		aut|aut2|aut3) 
 			namespace=$(sed 's/aut/uat/g' <<< $namespace)
 			;;
-		uta1|tua1|aut1)
-			namespace=$(sed -e 's/uta1/uat/g' -e 's/aut1/uat/g' -e 's/tua1/uat/g' <<< $namespace)
+		uat1|uta1|tua1|aut1)
+			namespace=$(sed -e 's/uat1/uat/' -e 's/uta1/uat/g' -e 's/aut1/uat/g' -e 's/tua1/uat/g' <<< $namespace)
 			;;
 		uat|uat2|uat3|prd|dev)
 			echo "Um momento ..."
