@@ -30,22 +30,15 @@ https://www.microsoft.com/pt-br/p/debian/9msvkqc78pk6?rtc=1&activetab=pivot:over
 #Os comandos abaixo tem que ser executados como root (Após sudo su)
 
 #Depois execute
-apt-get update 
-apt-get upgrade -y
-apt-get install -y vim bash-completion dos2unix curl apt-transport-https ca-certificates gnupg openssh-client git
+apt-get update && apt-get upgrade -y && apt-get install -y vim bash-completion dos2unix curl apt-transport-https ca-certificates gnupg openssh-client git
 
 #Instale o kubectl
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
-echo "$(<kubectl.sha256) kubectl" | sha256sum --check
-install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256" && echo "$(<kubectl.sha256) kubectl" | sha256sum --check && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 
 #Instale o GCP
-echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-apt-get update && apt-get install google-cloud-sdk -y
+echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && apt-get update && apt-get install google-cloud-sdk -y
 
-#Execute com usuário normal (Não privilegiado - root ou sudo )
+#Execute com usuário normal (Não privilegiado - Não pode ser root ou sudo )
 gcloud auth login
 
 #Copie o link mostrado e cole no navegador autentique com a sua conta engdb autorize o google sdk ter acesso a sua conta
