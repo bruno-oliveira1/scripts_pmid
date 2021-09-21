@@ -14,9 +14,9 @@ if [ -z $2 ]; then
 	fi
 else
 	namespace=$(echo "$2" | awk '{print tolower($0)}')
-	pod=$(echo "$1" | awk '{print tolower($0)}')
 	fi
 
+pod=$(echo "$1" | awk '{print tolower($0)}')
 checkVersion (){
 kubectl -n $namespace describe deploy $pod | grep -i Image
 }
