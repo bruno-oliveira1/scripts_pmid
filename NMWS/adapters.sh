@@ -44,19 +44,19 @@ do
                 cl_Http*|cl_Crivo)
                         if [ "$https" == "true" ];
                         then
-                        echo -n $service && echo -n " " && echo -e "Endpoint: https://$hostValue:$portValue$uriValue"
+                        echo -n $service && echo -n " " && echo -e "Apontamento: https://$hostValue:$portValue$uriValue"
                         else
-                        echo -n $service && echo -n " " && echo -e "Endpoint: http://$hostValue:$portValue$uriValue"
+                        echo -n $service && echo -n " " && echo -e "Apontamento: http://$hostValue:$portValue$uriValue"
                         fi
                         ;;
                 cl_Tcp)
-                        echo -n $service && echo -n " " && echo -e "Endpoint: tcp://$hostValue:$portValue"
+                        echo -n $service && echo -n " " && echo -e "Apontamento: tcp://$hostValue:$portValue"
                         ;;
                 cl_OracleDB)
-                        echo -n $service && echo -n " " && echo -e "Endpoint: jdbc:oracle:thin:@$hostValue:$portValue:$svcValue"
+                        echo -n $service && echo -n " " && echo -e "Apontamento: jdbc:oracle:thin:@$hostValue:$portValue:$svcValue"
                         ;;
                 cl_RabbitMQ)
-                        echo -n $service && echo -n " " && echo -e "Endpoint: amqp://$userValue:$passValue@$hostValue:$portValue"
+                        echo -n $service && echo -n " " && echo -e "Apontamento: amqp://$userValue:$passValue@$hostValue:$portValue"
                         ;;
         esac
 done
