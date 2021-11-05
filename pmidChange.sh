@@ -19,8 +19,8 @@ else
     read -r np<namespace.txt
 fi
 
-if [ "`ls *serviceList.temp* | wc -l`" > 0 ]; then
-    rm ${HOME}/serviceList.temp ${HOME}/var.temp
+if [ "`ls *serviceList.temp* 2> /dev/null | wc -l`" > 0 ]; then
+    rm ${HOME}/serviceList.temp ${HOME}/var.temp 2> /dev/null
 fi
 
 serviceList () {
@@ -30,9 +30,9 @@ serviceList () {
 	echo "recuperando steps do $orch..."
 
     #servicos convencionais
-	kubectl exec -it deploy/$orch -n $np -- bash -c "grep -i processid resources/*.bpmn" | cut -d \" -f 4 | sed -r 's/[A-Z]/-\L&/g' > ${HOME}/var.temp
+	kubectl exec -i deploy/$orch -n $np -- bash -c "grep -i processid resources/*.bpmn" | cut -d \" -f 4 | sed -r 's/[A-Z]/-\L&/g' > ${HOME}/var.temp
     #rules
-    kubectl exec -it deploy/$orch -n $np -- bash -c "grep -i httpUriTmplInline resources/*.bpmn" 2>/dev/null | grep -s rules | cut -d \/ -f 3 | cut -d \" -f 1 | cut -d \? -f 1 >> ${HOME}/var.temp
+    kubectl exec -i deploy/$orch -n $np -- bash -c "grep -i httpUriTmplInline resources/*.bpmn" 2>/dev/null | grep -s rules | cut -d \/ -f 3 | cut -d \" -f 1 | cut -d \? -f 1 >> ${HOME}/var.temp
     
 	for serviceItem in `sort ${HOME}/var.temp | uniq`; do
 
@@ -51,14 +51,14 @@ input=${HOME}/serviceList.temp
 
 printf "______________________________________________________________________\n\nResultado:\n"
 
-. checkVersion.sh $1 $np | cut -d \/ -f 3
+. checkVersion.sh $1 $np | cut -d \/ -f 4
 
 while read -r line; do
 
     if [ "`echo $line | grep -i rules`" != "" ]; then
-        . checkVersion.sh $line-v1 s-$np | cut -d \/ -f 3
+        . checkVersion.sh $line-v1 s-$np | cut -d \/ -f 4
     else
-        . checkVersion.sh $line $np | cut -d \/ -f 3
+        . checkVersion.sh $line $np | cut -d \/ -f 4
     fi
 
 done < "$input"
