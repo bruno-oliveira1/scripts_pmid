@@ -15,12 +15,12 @@ namespace=$(echo "$2" | awk '{print tolower($0)}')
 
 if [ -z $namespace ]; then
 	if [ -f namespace.txt ]; then
-		read -r namespace<namespace.txt		
+		namespace=$(<namespace.txt)
 	else
 	echo "Ambiente nao informado e arquivo namespace.txt nao existe"
 	exit 1
 	fi
-else
+fi
 	case $namespace in
 		uta|uta2|uta3) 
 			namespace=$(sed 's/uta/uat/g' <<< $namespace)
@@ -44,4 +44,3 @@ else
 		*)
 			echo "Ambiente informado diferente do esperado - Ex: uat, uat2, prd etc ..." 
 	esac
-fi
