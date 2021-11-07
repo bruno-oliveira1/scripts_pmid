@@ -2,7 +2,7 @@
 #!/bin/bash
 #               Autor: Bruno da Silva Oliveira <bruno.oliveira2@engdb.com.br>
 #               Date: 24/09/2021
-#               Descrição: Versão inicial versão modificada do viewAdapters.sh para ser usando em conjunto com o script todosadapters.sh
+#               Descrição: Versão inicial versão modificada do viewAdapters.sh para ser usado em conjunto com o script todosadapters.sh
 
 packageName=$1
 

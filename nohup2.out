@@ -1,0 +1,77 @@
+nohup: ignoring input
++ '[' uat '!=' '' ']'
++ np=uat
+++ ls '*serviceList.temp*'
+++ wc -l
++ '[' 0 ']'
++ rm /home/bruno/serviceList.temp /home/bruno/var.temp
++ serviceList orch-c-order-change-plan-v1
++ orch=orch-c-order-change-plan-v1
++ echo 'recuperando steps do orch-c-order-change-plan-v1...'
+recuperando steps do orch-c-order-change-plan-v1...
++ kubectl exec -it deploy/orch-c-order-change-plan-v1 -n uat -- bash -c 'grep -i processid resources/*.bpmn'
++ cut -d '"' -f 4
++ sed -r 's/[A-Z]/-\L&/g'
+Unable to use a TTY - input is not a terminal or the right kind of file
+E1105 15:32:05.340034    2610 v2.go:105] read /dev/stdin: bad file descriptor
++ kubectl exec -it deploy/orch-c-order-change-plan-v1 -n uat -- bash -c 'grep -i httpUriTmplInline resources/*.bpmn'
++ grep -s rules
++ cut -d / -f 3
++ cut -d '"' -f 1
++ cut -d '?' -f 1
+++ sort /home/bruno/var.temp
+++ uniq
++ for serviceItem in `sort ${HOME}/var.temp | uniq`
++ echo c-consume-imei-v1
+++ echo c-consume-imei-v1
+++ grep orch
++ '[' '' '!=' '' ']'
++ for serviceItem in `sort ${HOME}/var.temp | uniq`
++ echo c-group-v1
+++ echo c-group-v1
+++ grep orch
++ '[' '' '!=' '' ']'
++ for serviceItem in `sort ${HOME}/var.temp | uniq`
++ echo c-interaction-protocol-v1
+++ echo c-interaction-protocol-v1
+++ grep orch
++ '[' '' '!=' '' ']'
++ for serviceItem in `sort ${HOME}/var.temp | uniq`
++ echo c-order-creation-v1
+++ echo c-order-creation-v1
+++ grep orch
++ '[' '' '!=' '' ']'
++ for serviceItem in `sort ${HOME}/var.temp | uniq`
++ echo c-resource-v1
+++ echo c-resource-v1
+++ grep orch
++ '[' '' '!=' '' ']'
++ for serviceItem in `sort ${HOME}/var.temp | uniq`
++ echo c-sales-order-vertex-v1
+++ echo c-sales-order-vertex-v1
+++ grep orch
++ '[' '' '!=' '' ']'
++ for serviceItem in `sort ${HOME}/var.temp | uniq`
++ echo imdb-read-billing-data-v1
+++ echo imdb-read-billing-data-v1
+++ grep orch
++ '[' '' '!=' '' ']'
++ for serviceItem in `sort ${HOME}/var.temp | uniq`
++ echo n-events-order-v1
+++ echo n-events-order-v1
+++ grep orch
++ '[' '' '!=' '' ']'
++ for serviceItem in `sort ${HOME}/var.temp | uniq`
++ echo orch-r-bank-info-v1
+++ echo orch-r-bank-info-v1
+++ grep orch
++ '[' orch-r-bank-info-v1 '!=' '' ']'
++ serviceList orch-r-bank-info-v1
++ orch=orch-r-bank-info-v1
++ echo 'recuperando steps do orch-r-bank-info-v1...'
+recuperando steps do orch-r-bank-info-v1...
++ kubectl exec -it deploy/orch-r-bank-info-v1 -n uat -- bash -c 'grep -i processid resources/*.bpmn'
++ cut -d '"' -f 4
++ sed -r 's/[A-Z]/-\L&/g'
+Unable to use a TTY - input is not a terminal or the right kind of file
+E1105 15:32:17.839344    2669 v2.go:105] read /dev/stdin: bad file descriptor

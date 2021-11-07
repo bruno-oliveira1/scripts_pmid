@@ -51,14 +51,18 @@ input=${HOME}/serviceList.temp
 
 printf "______________________________________________________________________\n\nResultado:\n"
 
-    checkVersion.sh $1 $np | cut -d \/ -f 4
+    #checkVersion.sh $1 $np | cut -d \/ -f 4
+    versao=$(checkVersion.sh $1 $np | cut -d\: -f3)
+    echo $1:"$versao"
 
 while read -r line; do
 
     if [ "`echo $line | grep -i rules`" != "" ]; then
-        checkVersion.sh $line-v1 s-$np | cut -d \/ -f 4
-    else
-        checkVersion.sh $line $np | cut -d \/ -f 4
+        versao=$(checkVersion.sh $line-v1 s-$np | cut -d\: -f3)
+        echo $line:"$versao"
+        else
+        versao=$(checkVersion.sh $line $np | cut -d\: -f3)
+        echo $line:"$versao"
     fi
 
 done < "$input"
