@@ -1,0 +1,122 @@
+#Referencia
+
+#Antes de começar certifique-se que não tem nenhum programa de virtualização instalado no seu PC (Hyper-V, VirtualBox, VMWare, QEMU, etc...)
+
+#Execute no powershell como admin 
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+
+#Reinicie o computador
+
+#Instale
+https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi
+
+#Execute
+wsl --set-default-version 2
+
+#Para mais detalhes
+https://docs.microsoft.com/en-us/windows/wsl/install-win10
+
+#Abra a microsoft store e baixe o Debian
+https://www.microsoft.com/pt-br/p/debian/9msvkqc78pk6?rtc=1&activetab=pivot:overviewtab
+
+#Espere instalar 
+
+#Abre o app Debian e defina uma senha
+
+#Após abrir finalizar abra o Debian 
+#Digite sudo su digite a senha definida anteriormente
+
+#Os comandos abaixo tem que ser executados como root (Após sudo su)
+
+#Depois execute
+apt-get update && apt-get upgrade -y && apt-get install -y vim bash-completion dos2unix curl apt-transport-https ca-certificates gnupg openssh-client git
+
+#Instale o kubectl
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && curl -LO "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256" && echo "$(<kubectl.sha256) kubectl" | sha256sum --check && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+#Instale o GCP
+echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && apt-get update && apt-get install google-cloud-sdk -y
+
+#Execute com usuário normal (Não privilegiado - Não pode ser root ou sudo )
+gcloud auth login
+
+#Copie o link mostrado e cole no navegador autentique com a sua conta engdb autorize o google sdk ter acesso a sua conta
+Ex:
+Go to the following link in your browser:
+https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=32555940559.apps.googleusercontent.com&redirect_uri=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob&scope=openid+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcloud-platform+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fappengine.admin+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcompute+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Faccounts.reauth&state=1WLCuxrxV0HA2EsA1XCKzkpty8R0Z3&prompt=consent&access_type=offline&code_challenge=jhqMQLH3VQ6eYf4BGIkskoArcnENLvpLOIFqeeoY3lU&code_challenge_method=S256
+
+#Copie o codigo gerado no navegador e cole no terminal:
+Ex:
+Enter verification code: 4/1AX4XfWi3PHITRLUH8HpyDSUqFthk_vlkEiExYgZIGQQhP9v75wFVaRYnYXI
+
+#Se obtiver sucesso será exibida uma mensagem parecida com o exemplo abaixo:
+Ex:
+You are now logged in as [xxxxxx@engdb.com.br].
+
+
+#Fontes
+#Instalar WSL
+https://docs.microsoft.com/en-us/windows/wsl/install-win10
+
+#Instalar Debian
+https://www.microsoft.com/pt-br/p/debian/9msvkqc78pk6?rtc=1&activetab=pivot:overviewtab
+
+#Instalar GCP
+https://cloud.google.com/sdk/docs/install#deb
+
+#GCP auth
+https://cloud.google.com/sdk/gcloud/reference/auth/login
+
+#Disco C no linux
+https://blog.buckaway.name/in-wsl2-the-linux-files-are-stored-in-a-container-fc005e1e924f
+
+#Instalar kubectl
+https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
+
+
+#######Extra integrando com gitlab
+
+#####Executado com usuário sem privilégio
+
+#Gere uma chave ssh
+ssh-keygen -t rsa -b 4096
+
+Obs:
+Será pedido para informar uma passphrase que é uma senha para decriptar a chave ssh garantindo que se caso alguém tenha acesso as suas chaves não consiga fazer nada pois não tem sua passphrase  
+
+#Veja o conteudo da chave e copie    
+cat .ssh/id_rsa.pub
+
+#Acesse
+https://gitlab.engdb.com.br/profile/keys
+
+#Cole sua chave SSH e salve
+
+#Crie o arquivo config 
+vim .ssh/config
+
+#Com o conteudo
+Host gitlab.engdb.com.br
+  PreferredAuthentications publickey
+  IdentityFile ~/.ssh/id_rsa
+
+#Testando se tudo deu certo
+ssh -T git@gitlab.engdb.com.br
+
+####Para mais info 
+https://docs.gitlab.com/ce/ssh/index.html
+
+#Para baixar os scripts do PMID faça (No diretório home do usuário Ex: /home/bruno/)
+git clone git@gitlab.engdb.com.br:bdasilvaol/scripts.git
+
+#Adicionar scripts ao PATH
+#Edite o arquivo .bashrc
+export PATH="$HOME/scripts:$PATH"
+
+#Adicionar o seu diretório home do Windows ao Linux
+homewin="/mnt/c/Users/seuusuariowindows"
+#Ex: homewin="/mnt/c/Users/Administrador"
+
+#Depois para aplicar as alterações
+source .bashrc
