@@ -64,7 +64,7 @@ else
 			namespace=$(sed -e 's/uta1/uat/g' -e 's/aut1/uat/g' -e 's/tua1/uat/g' <<< $namespace)
 			checkEndpoint $svc $namespace
 			;;
-		uat|uat2|uat3|prd|dev)
+		uat|uat2|uat3|prd|dev|s-uat|m-uat|f-uat|e-uat|s-uat2|m-uat2|f-uat2|e-uat2|s-uat3|m-uat3|f-uat3|e-uat3)
 			checkEndpoint $svc $namespace
 			;;
 		*)
