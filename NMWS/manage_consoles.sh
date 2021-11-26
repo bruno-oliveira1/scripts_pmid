@@ -1,4 +1,9 @@
 #!/bin/bash
+PATH="/appl/oracle/jdks/jdk1.6/bin:/usr/kerberos/bin:/usr/local/bin:/bin:/usr/bin:/usr/sbin:/infobus/uat1/bin:.:/infobus/uat1/cmd:/ora10gCL/product/10.2.0/bin:/sbin"
+dia=$(date +%Y_%m_%d)
+log=/infobus/uat1/cmd/logs/"$dia"_manage_console.log
+
+echo "Inicio $(date +%H:%M:%S_%d_%m_%Y)" > "$log"
 
 #Funções 
 
@@ -60,7 +65,7 @@ nod
     while [ $cont -lt ${#instacias[@]} ]
     do
     status
-    echo "No servidor "${servidores[$int]}" o nod "${instacias[$cont]}" está "$estado" "
+    echo "No servidor "${servidores[$int]}" o nod "${instacias[$cont]}" está "$estado" " >> "$log"
 
     cont=$(( $cont + 1 ))
     done
@@ -240,3 +245,5 @@ case $1 in
             echo " manage_consoles.sh parcial ou manage_consoles.sh p para fazer restart parcial das consoles (terças quartas quintas)"
             echo " " 
 	esac
+    echo "Fim $(date +%H:%M:%S_%d_%m_%Y)" >> "$log"
+telegram.sh "$log"
