@@ -22,7 +22,7 @@ if [ "`kubectl -n $namespace describe deploy $svc | grep -i db_host`" != "" ]; t
         echo "PROCEDURE:             $proc"
 
 else
-        kubectl -n $namespace describe deploy $svc | grep -i provider_address | sed 's/^ *//g'
+        kubectl -n $namespace describe deploy $svc | grep -i 'RABBIT_PUBLISH\|provider_address' | sed 's/^ *//g'
 fi
 }
 
