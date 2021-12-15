@@ -257,6 +257,9 @@ reinicio () {
             find . -maxdepth 1 -name "wlst_*.*" -print0 | xargs -0 rm
             echo "Fim $(date +%H:%M:%S_%d_%m_%Y)" >> "$log"
             #telegram.sh "$log"
+            kill -9 `ps -ef | grep weblogic.WLST | grep -v grep | awk '{print $2}'` 2> /dev/null
+            kill -9 `ps -ef | grep wlst.sh | grep -v grep | awk '{print $2}'` 2> /dev/null
+
 }
 
 usuario="system"
