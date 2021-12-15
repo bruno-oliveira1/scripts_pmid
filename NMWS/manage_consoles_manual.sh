@@ -2,6 +2,7 @@
 PATH="/appl/oracle/jdks/jdk1.6/bin:/usr/kerberos/bin:/usr/local/bin:/bin:/usr/bin:/usr/sbin:/infobus/uat1/bin:.:/infobus/uat1/cmd:/ora10gCL/product/10.2.0/bin:/sbin"
 dia=$(date +%Y_%m_%d)
 log=/infobus/uat1/cmd/logs/"$dia"_manage_console.log
+temp=/tmp/status_consoles.temp
 
 #Funções
 
@@ -16,7 +17,8 @@ EOF
 estado=$(grep -o 'FAILED_NOT_RESTARTABLE\|UNKNOWN\|SHUTDOWN\|RUNNING\|ADMIN' <<< $estado)
 }
 
-#
+#Mostrar status dos nods
+
 stop () {
 $wlst <<EOF 1>&- 2>&- &
 connect("$usuario","${senhas[$int]}","t3://${servidores[$int]}")
@@ -25,6 +27,7 @@ exit()
 EOF
 }
 
+#Inicia os nods
 start () {
 $wlst <<EOF 1>&- 2>&- &
 connect("$usuario","${senhas[$int]}","t3://${servidores[$int]}")
@@ -33,6 +36,7 @@ exit()
 EOF
 }
 
+#Resume os nods
 resume () {
 $wlst <<EOF 1>&- 2>&- &
 connect("$usuario","${senhas[$int]}","t3://${servidores[$int]}")
@@ -41,6 +45,7 @@ exit()
 EOF
 }
 
+#Recupera os nods
 nod () {
 nod=$("$wlst" <<EOF &
 connect("$usuario","${senhas[$int]}","t3://${servidores[$int]}")
@@ -98,16 +103,17 @@ nod
 done
 }
 
+#Verifica se o status do nod esta em ADMIN e resume os nods
 verificastatus () {
-cat "$log" | grep ADMIN > /dev/null
+cat "$temp" | grep ADMIN > /dev/null
 
 if [ "$?" -eq 0 ]; then
-servidores=( $(cat "$log" | grep ADMIN |awk '{print $3}') )
-instacias=( $(cat "$log" | grep ADMIN |awk '{print $6}') )
+servidores=( $(cat "$temp" | grep ADMIN |awk '{print $3}') )
+instacias=( $(cat "$temp" | grep ADMIN |awk '{print $6}') )
 resumiralgnods
 sleep 120
 fi
-
+rm -rf $temp
 kill -9 `ps -ef | grep -i wlst.sh | grep -v grep | awk '{print $2 }'`
 }
 
@@ -156,6 +162,26 @@ nod
 done
 }
 
+resumiralgnods () {
+    #Variável de contador
+int=0
+
+#Compara se o valor de int é menor que o de quantidade e se for executa o a condição abaixo senão for encerra a execução do script
+while [ $int -lt ${#servidores[@]} ]
+do
+        #echo "O servidor "${servidores[$int]}" tem os nos "${instacias[@]}""
+    cont=0
+    while [ $cont -lt ${#instacias[@]} ]
+    do
+    resume
+    cont=$(( $cont + 1 ))
+    done
+
+    #Incrementa 1 a int
+        int=$(( $int + 1 ))
+done
+}
+
 resumirnods () {
     #Variável de contador
 int=0
@@ -177,31 +203,11 @@ nod
 done
 }
 
-resumiralgnods () {
-    #Variável de contador
-int=0
-
-#Compara se o valor de int é menor que o de quantidade e se for executa o a condição abaixo senão for encerra a execução do script
-while [ $int -lt ${#servidores[@]} ]
-do
-        #echo "O servidor "${servidores[$int]}" tem os nos "${instacias[@]}""
-    cont=0
-    while [ $cont -lt ${#instacias[@]} ]
-    do
-    resume
-    cont=$(( $cont + 1 ))
-    done
-
-    #Incrementa 1 a int
-        int=$(( $int + 1 ))
-done
-}
-
-
 mostrarnod () {
 #Variável de contador
 int=0
 
+echo "Exibindo servidores e nods"
 #Compara se o valor de int é menor que o de quantidade e se for executa o a condição abaixo senão for encerra a execução do script
 while [ $int -lt ${#servidores[@]} ]
 do
@@ -213,7 +219,7 @@ nod
     echo "Servidor "${servidores[$int]}" nod "${instacias[$cont]}" "
     cont=$(( $cont + 1 ))
     done
-
+        echo "________________________________________________________________________"
     #Incrementa 1 a int
         int=$(( $int + 1 ))
 done
@@ -256,7 +262,8 @@ reinicio () {
 }
 
 usuario="system"
-wlst=/appl/oracle/Oracle/Middleware/wlserver_10.3/common/bin/wlst.sh
+wlst="/appl/oracle/Oracle/Middleware/wlserver_10.3/common/bin/wlst.sh"
+
 
 case "$1" in
                 todos)
