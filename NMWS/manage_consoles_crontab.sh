@@ -67,7 +67,7 @@ nod
     while [ $cont -lt ${#instacias[@]} ]
     do
     status
-    echo "No servidor "${servidores[$int]}" o nod "${instacias[$cont]}" está "$estado"  " | tee -a "$temp"
+    echo "No servidor "${servidores[$int]}" o nod "${instacias[$cont]}" está "$estado"  ">> "$temp"
 
     cont=$(( $cont + 1 ))
     done
@@ -256,9 +256,9 @@ reinicio () {
             cd /appl/oracle/Oracle/Middleware/logs
             find . -maxdepth 1 -name "wlst_*.*" -print0 | xargs -0 rm
             echo "Fim $(date +%H:%M:%S_%d_%m_%Y)" >> "$log"
-            #telegram.sh "$log"
             kill -9 `ps -ef | grep weblogic.WLST | grep -v grep | awk '{print $2}'` 2> /dev/null
             kill -9 `ps -ef | grep wlst.sh | grep -v grep | awk '{print $2}'` 2> /dev/null
+            #telegram.sh "$log"
 
 }
 
