@@ -98,9 +98,6 @@ grep Apontamento apontamentos_pmid_$namespace.txt > arqaux
 awk 'sub("$", "\r")' < arqaux > apontamentos_pmid_$namespace.txt 
 awk 'sub("$", "\r")' < arqaux2 > apontamentos_pmid_sem_provider_$namespace.txt
 
-#Pegando por nome e por ip
-rm -rf arqaux*
-
 #Separando apontamentos por nome e por ip
 grep -E '\@[0-9]{2}' apontamentos_pmid_$namespace.txt >> apontamentos_pmid_ip_$namespace.txt
 grep -Ei '\@[a-z]{2}' apontamentos_pmid_$namespace.txt >> apontamentos_pmid_nome_$namespace.txt
@@ -115,3 +112,11 @@ cp apontamentos_pmid_$namespace.txt /mnt/c/Users/$usuario/Downloads/
 cp apontamentos_pmid_sem_provider_$namespace.txt /mnt/c/Users/$usuario/Downloads/
 cp apontamentos_pmid_nome_$namespace.txt /mnt/c/Users/$usuario/Downloads/
 cp apontamentos_pmid_ip_$namespace.txt /mnt/c/Users/$usuario/Downloads/
+
+cat arqaux > apontamentos_pmid_$namespace.txt 
+cat arqaux2 > apontamentos_pmid_sem_provider_$namespace.txt
+
+#Pegando por nome e por ip
+rm -rf arqaux*
+
+
