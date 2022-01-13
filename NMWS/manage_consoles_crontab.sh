@@ -103,16 +103,32 @@ done
 
 #Verifica se o status do nod esta em ADMIN e resume os nods
 verificastatus () {
-cat "$temp" | grep ADMIN > /dev/null
+servidor=( $(grep servidor log.txt | grep -v RUNNING | awk '{print $3}') )
+instacias=( $(grep servidor log.txt | grep -v RUNNING | awk '{print $6}') )
+estado=( $(grep servidor log.txt | grep -v RUNNING | awk '{print $8}') )
 
-if [ "$?" -eq 0 ]; then
-servidores=( $(cat "$temp" | grep ADMIN |awk '{print $3}') )
-instacias=( $(cat "$temp" | grep ADMIN |awk '{print $6}') )
-resumiralgnods
+int=0
+cont=0
+while [ $int -lt ${#servidores[@]} ]
+do
+   if [ "${servidores[$int]}" = "${servidor[$cont]}" ]; then
+       #echo "${servidores[$int]}" "${instacias[$cont]}" "${estado[$cont]}"
+       case ${estado[$cont]} in
+       ADMIN)
+       #echo "${servidores[$int]}" resumir "${instacias[$cont]}" que esta como "${estado[$cont]}"
+       resume
+       ;; 
+       *)
+       #echo "${servidores[$int]}" iniciando "${instacias[$cont]}" que esta como "${estado[$cont]}"
+       start
+       esac
+   cont=$(( $cont + 1 ))
+   fi
+   int=$(( $int + 1 ))
+done
 sleep 120
-fi
-rm -rf $temp
 kill -9 `ps -ef | grep -i wlst.sh | grep -v grep | awk '{print $2 }'`
+rm -rf $temp
 }
 
 pararnods () {
@@ -152,26 +168,6 @@ nod
     while [ $cont -lt ${#instacias[@]} ]
     do
     start
-    cont=$(( $cont + 1 ))
-    done
-
-    #Incrementa 1 a int
-        int=$(( $int + 1 ))
-done
-}
-
-resumiralgnods () {
-    #Variável de contador
-int=0
-
-#Compara se o valor de int é menor que o de quantidade e se for executa o a condição abaixo senão for encerra a execução do script
-while [ $int -lt ${#servidores[@]} ]
-do
-        #echo "O servidor "${servidores[$int]}" tem os nos "${instacias[@]}""
-    cont=0
-    while [ $cont -lt ${#instacias[@]} ]
-    do
-    resume
     cont=$(( $cont + 1 ))
     done
 
