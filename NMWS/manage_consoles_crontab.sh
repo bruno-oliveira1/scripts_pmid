@@ -112,17 +112,14 @@ cont=0
 while [ $int -lt ${#servidores[@]} ]
 do
    if [ "${servidores[$int]}" = "${servidor[$cont]}" ]; then
-       #echo "${servidores[$int]}" "${instacias[$cont]}" "${estado[$cont]}"
-       case ${estado[$cont]} in
-       ADMIN)
-       #echo "${servidores[$int]}" resumir "${instacias[$cont]}" que esta como "${estado[$cont]}"
-       resume
-       ;; 
-       *)
-       #echo "${servidores[$int]}" iniciando "${instacias[$cont]}" que esta como "${estado[$cont]}"
-       start
-       esac
-   cont=$(( $cont + 1 ))
+        case ${estado[$cont]} in
+            ADMIN)
+                resume
+                    ;; 
+            *)
+                start
+        esac
+        cont=$(( $cont + 1 ))
    fi
    int=$(( $int + 1 ))
 done
