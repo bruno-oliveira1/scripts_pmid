@@ -2,6 +2,7 @@
 PATH="/appl/oracle/jdks/jdk1.6/bin:/usr/kerberos/bin:/usr/local/bin:/bin:/usr/bin:/usr/sbin:/infobus/uat1/bin:.:/infobus/uat1/cmd:/ora10gCL/product/10.2.0/bin:/sbin"
 dia=$(date +%Y_%m_%d)
 log=/infobus/uat1/cmd/logs/"$dia"_manage_console.log
+logs=/infobus/uat1/cmd/logs
 temp=/tmp/status_consoles.temp
 
 #Funções
@@ -126,6 +127,7 @@ done
 sleep 120
 kill -9 `ps -ef | grep -i wlst.sh | grep -v grep | awk '{print $2 }'`
 rm -rf $temp
+find $logs -name "*manage*" -type f -mtime +30 -delete
 }
 
 pararnods () {
