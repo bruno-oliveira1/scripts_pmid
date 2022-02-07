@@ -104,9 +104,9 @@ done
 
 #Verifica se o status do nod esta em ADMIN e resume os nods
 verificastatus () {
-servidor=( $(grep servidor log.txt | grep -v RUNNING | awk '{print $3}') )
-instacias=( $(grep servidor log.txt | grep -v RUNNING | awk '{print $6}') )
-estado=( $(grep servidor log.txt | grep -v RUNNING | awk '{print $8}') )
+servidor=( $(grep servidor $temp | grep -v RUNNING | awk '{print $3}') )
+instacias=( $(grep servidor $temp | grep -v RUNNING | awk '{print $6}') )
+estado=( $(grep servidor $temp | grep -v RUNNING | awk '{print $8}') )
 
 int=0
 cont=0
@@ -119,6 +119,8 @@ do
                     ;; 
             *)
                 start
+                sleep 360
+                resume
         esac
         cont=$(( $cont + 1 ))
    fi
