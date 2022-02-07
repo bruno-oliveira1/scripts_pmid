@@ -17,12 +17,16 @@
 #             Data: 04/2021
 #             Descrição: condição para o ambiente ser variável (caso não informe o ambiente será considerado o do namespace.txt)
 
-if [ -z $2 ] 
-then
-	read -r namespace<namespace.txt
-else
-namespace=$2
+pod=$(echo "$1" | awk '{print tolower($0)}')
+namespace=$(echo "$2" | awk '{print tolower($0)}')
+
+if [ -z $namespace ]; then
+	if [ -f  $HOME/namespace.txt ]; then
+		namespace=$(< $HOME/namespace.txt)
+	else
+	echo "Ambiente nao informado e arquivo  $HOME/namespace.txt nao existe"
+	exit 1
+	fi
 fi
-pod=$1
 
 kubectl -n $namespace exec -it deploy/$pod /bin/bash
