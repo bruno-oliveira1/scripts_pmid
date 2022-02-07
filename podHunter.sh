@@ -15,14 +15,20 @@
 #             Descrição: Primeira versão.
 #
 
+namespace=$(echo "$3" | awk '{print tolower($0)}')
+
+if [ -z $namespace ]; then
+	if [ -f  $HOME/namespace.txt ]; then
+		namespace=$(< $HOME/namespace.txt)
+	else
+	echo "Ambiente nao informado e arquivo  $HOME/namespace.txt nao existe"
+	exit 1
+	fi
+fi
+
 tid=$2
 rm pods.txt 2> /dev/null
 rm foundpods.txt  2> /dev/null
-if [ $3 != "" 2>/dev/null ]; then 
-    np=$3
-else
-    read -r np<namespace.txt
-fi
 
 if [ "`cat *serviceList.temp* | wc -l`" > 0 ]; then
     rm ${HOME}/serviceList.temp ${HOME}/var.temp 2> /dev/null
