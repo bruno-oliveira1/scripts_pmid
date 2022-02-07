@@ -13,10 +13,16 @@
 #             Data: 04/2020
 #             Descrição: Primeira versão.
 
-if [ $2 != "" 2>/dev/null ]; then
-    np=$2
-else
-    read -r np<namespace.txt
+orch=$(echo "$1" | awk '{print tolower($0)}')
+namespace=$(echo "$2" | awk '{print tolower($0)}')
+
+if [ -z $namespace ]; then
+	if [ -f  $HOME/namespace.txt ]; then
+		namespace=$(< $HOME/namespace.txt)
+	else
+	echo "Ambiente nao informado e arquivo  $HOME/namespace.txt nao existe"
+	exit 1
+	fi
 fi
 
 if [ "`ls *serviceList.temp* 2> /dev/null | wc -l`" > 0 ]; then
@@ -24,8 +30,6 @@ if [ "`ls *serviceList.temp* 2> /dev/null | wc -l`" > 0 ]; then
 fi
 
 serviceList () {
-
-	orch=$1
 
 	echo "recuperando steps do $orch..."
 
