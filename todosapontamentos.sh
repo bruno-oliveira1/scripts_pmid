@@ -42,9 +42,9 @@ namespace=$(echo "$1" | awk '{print tolower($0)}')
 #Verifica se a variavel $namespace existe e/ou se é nula 
 if [ -z $namespace ]; then
 	#Se for verdadeira a condição verifica se o arquivo namespace.txt existe 
-	if [ -f namespace.txt ]; then
+	if [ -f $HOME/namespace.txt ]; then
 		#Se existir mapeia o valor de namespace.txt para a variavel namespace
-		read -r namespace<namespace.txt
+		read -r namespace<$HOME/namespace.txt
 	else
 		#Se o arquivo namespace.txt não existir e logo a variavel namespace também é nula aborta o script e retorna código de erro 1 
 		echo "Ambiente nao informado e arquivo namespace.txt nao existe"

@@ -14,10 +14,10 @@ pod=$(echo "$1" | awk '{print tolower($0)}')
 namespace=$(echo "$2" | awk '{print tolower($0)}')
 
 if [ -z $namespace ]; then
-	if [ -f namespace.txt ]; then
-		namespace=$(<namespace.txt)
+	if [ -f  $HOME/namespace.txt ]; then
+		namespace=$(< $HOME/namespace.txt)
 	else
-	echo "Ambiente nao informado e arquivo namespace.txt nao existe"
+	echo "Ambiente nao informado e arquivo  $HOME/namespace.txt nao existe"
 	exit 1
 	fi
 fi

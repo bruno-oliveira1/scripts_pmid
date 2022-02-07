@@ -39,8 +39,8 @@ fi
 	esac
 
 if [ -z $2 ]; then
-	if [ -f namespace.txt ]; then
-		read -r namespace<namespace.txt
+	if [ -f $HOME/namespace.txt ]; then
+		read -r namespace<$HOME/namespace.txt
 	else
 		echo "Ambiente nao informado e arquivo namespace.txt nao existe"
 		exit 1

@@ -18,40 +18,40 @@
 #             Descrição: Mudança para "case" e validação de entrada.
 #
 
-if [ -z $1 ]
-then
-namespace=$1
-	#enquanto vazio o script pergunta qual deve ser passado até que o usuario passe algum
-        while [ -z $namespace ]
-        do
-                read -p "Voce esqueceu de colocar o namespace (fqa, prd ou dev): " namespace
-                letra_up=$(echo $namespace | awk '{ print toupper($1) }')
-        done
-else
-	#troca a entrada para letras maisculas
-        letra_up=$(echo $1 | awk '{ print toupper($1) }')
+namespace=$(echo "$1" | awk '{print tolower($0)}')
+
+if [ -z $namespace ]; then
+	if [ -f  $HOME/namespace.txt ]; then
+		namespace=$(< $HOME/namespace.txt)
+	else
+	echo "Ambiente nao informado e arquivo $HOME/namespace.txt nao existe"
+	exit 1
+	fi
 fi
 
-case $letra_up in
-        DEV)
-        gcloud config set project tim-pmid-dev
-        gcloud config set compute/region southamerica-east1 
-        gcloud container clusters get-credentials pmid-dev --region=southamerica-east1
+case $namespace in
+        dev)
+        gcloud config set project tim-pmid-dev 1>&- 2>&-
+        gcloud config set compute/region southamerica-east1 1>&- 2>&- 
+        gcloud container clusters get-credentials pmid-dev --region=southamerica-east1 1>&- 2>&-
+        sed -i "1 s/^.*$/dev/" $HOME/namespace.txt
         echo "Você entrou no cluster DEV"
         ;;
 
-        FQA)
-        gcloud config set project tim-pmid-fqa                                                                                              
-		gcloud config set compute/region southamerica-east1                                                                                           
-		gcloud container clusters get-credentials tim-pmid-uat --region southamerica-east1 --project tim-pmid-fqa
-		echo "Você entrou no cluster FQA"
+        fqa)
+        gcloud config set project tim-pmid-fqa 1>&- 2>&-                                                                                            
+	gcloud config set compute/region southamerica-east1 1>&- 2>&-                                                                                           
+	gcloud container clusters get-credentials tim-pmid-uat --region southamerica-east1 --project tim-pmid-fqa 1>&- 2>&-
+        sed -i "1 s/^.*$/uat/" $HOME/namespace.txt
+	echo "Você entrou no cluster FQA"
         ;;
 
-        PRD)
-		gcloud config set project tim-pmid-prd 
-		gcloud config set compute/region southamerica-east1                                                                                              
-		gcloud container clusters get-credentials pmid-prod --region=southamerica-east1
-		echo "Você entrou no cluster PRD"
+        prd)
+	gcloud config set project tim-pmid-prd 1>&- 2>&-
+	gcloud config set compute/region southamerica-east1 1>&- 2>&-
+	gcloud container clusters get-credentials pmid-prod --region=southamerica-east1 1>&- 2>&-
+        sed -i "1 s/^.*$/prd/" $HOME/namespace.txt
+	echo "Você entrou no cluster PRD"
         ;;
 
         *)
