@@ -14,4 +14,4 @@
 #             Data: 01/2021
 #             Descrição: Primeira versão.
 
-sed -i "1 s/^.*$/$1/" namespace.txt
+sed -i "1 s/^.*$/$1/" $HOME/namespace.txt
