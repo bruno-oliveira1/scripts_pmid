@@ -55,6 +55,6 @@ case $namespace in
         ;;
 
         *)
-        echo "Parametro invalido"
+        echo "Ambiente informado invalido"
         ;;
 esac
