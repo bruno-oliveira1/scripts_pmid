@@ -31,25 +31,25 @@ fi
 
 case $namespace in
         dev)
-        gcloud config set project tim-pmid-dev 1>&- 2>&-
-        gcloud config set compute/region southamerica-east1 1>&- 2>&- 
-        gcloud container clusters get-credentials pmid-dev --region=southamerica-east1 1>&- 2>&-
+        gcloud config set project tim-pmid-dev --user-output-enabled=false
+        gcloud config set compute/region southamerica-east1 --user-output-enabled=false 
+        gcloud container clusters get-credentials pmid-dev --region=southamerica-east1 --user-output-enabled=false
         sed -i "1 s/^.*$/dev/" $HOME/namespace.txt
         echo "Você entrou no cluster DEV"
         ;;
 
         fqa)
-        gcloud config set project tim-pmid-fqa 1>&- 2>&-                                                                                            
-	gcloud config set compute/region southamerica-east1 1>&- 2>&-                                                                                           
-	gcloud container clusters get-credentials tim-pmid-uat --region southamerica-east1 --project tim-pmid-fqa 1>&- 2>&-
+        gcloud config set project tim-pmid-fqa --user-output-enabled=false                                                                                            
+	gcloud config set compute/region southamerica-east1 --user-output-enabled=false                                                                                           
+	gcloud container clusters get-credentials tim-pmid-uat --region southamerica-east1 --project tim-pmid-fqa --user-output-enabled=false
         sed -i "1 s/^.*$/uat/" $HOME/namespace.txt
 	echo "Você entrou no cluster FQA"
         ;;
 
         prd)
-	gcloud config set project tim-pmid-prd 1>&- 2>&-
-	gcloud config set compute/region southamerica-east1 1>&- 2>&-
-	gcloud container clusters get-credentials pmid-prod --region=southamerica-east1 1>&- 2>&-
+	gcloud config set project tim-pmid-prd --user-output-enabled=false
+	gcloud config set compute/region southamerica-east1 --user-output-enabled=false
+	gcloud container clusters get-credentials pmid-prod --region=southamerica-east1 --user-output-enabled=false
         sed -i "1 s/^.*$/prd/" $HOME/namespace.txt
 	echo "Você entrou no cluster PRD"
         ;;
