@@ -18,7 +18,7 @@ else
 
 pod=$(echo "$1" | awk '{print tolower($0)}')
 checkVersion (){
-kubectl -n $namespace describe deploy $pod | grep -i Image
+kubectl -n $namespace describe deploy $pod 2>/dev/null | grep -i Image || echo naoinstalado
 }
 
 checkVersion $pod $namespace
