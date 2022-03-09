@@ -60,10 +60,10 @@ checkVersion.sh $1 $namespace | cut -d \/ -f 3
 while read -r line; do
 
     if [ "`echo $line | grep -i rules`" != "" ]; then
-        versao=$(checkVersion.sh $line-v1 s-$namespace  | awk -F : '{print $3}')
+        versao=$(checkVersion.sh $line-v1 s-$namespace  | awk -F ' ' '{print $2}')
 		echo -e "$line-v1 $versao"
     else
-        versao=$(checkVersion.sh $line $namespace  | awk -F : '{print $3}')
+        versao=$(checkVersion.sh $line $namespace  | awk -F ' ' '{print $2}')
 		echo -e "$line $versao"
     fi
 
