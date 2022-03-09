@@ -13,9 +13,6 @@
 #             Data: 04/2020
 #             Descrição: Primeira versão.
 
-orch=$(echo "$1" | awk '{print tolower($0)}')
-namespace=$(echo "$2" | awk '{print tolower($0)}')
-
 if [ -z $namespace ]; then
 	if [ -f  $HOME/namespace.txt ]; then
 		namespace=$(< $HOME/namespace.txt)
@@ -25,18 +22,20 @@ if [ -z $namespace ]; then
 	fi
 fi
 
-if [ "`ls *serviceList.temp* 2> /dev/null | wc -l`" > 0 ]; then
-    rm ${HOME}/serviceList.temp ${HOME}/var.temp 2> /dev/null
+if [ "`ls *serviceList.temp* | wc -l`" > 0 ]; then
+    rm ${HOME}/serviceList.temp ${HOME}/var.temp
 fi
 
 serviceList () {
 
+	orch=$1
+
 	echo "recuperando steps do $orch..."
 
     #servicos convencionais
-	kubectl exec -i deploy/$orch -n $np -- bash -c "grep -i processid resources/*.bpmn" | cut -d \" -f 4 | sed -r 's/[A-Z]/-\L&/g' > ${HOME}/var.temp
+	kubectl exec -it deploy/$orch -n $namespace -- bash -c "grep -i processid resources/*.bpmn" | cut -d \" -f 4 | sed -r 's/[A-Z]/-\L&/g' > ${HOME}/var.temp
     #rules
-    kubectl exec -i deploy/$orch -n $np -- bash -c "grep -i httpUriTmplInline resources/*.bpmn" 2>/dev/null | grep -s rules | cut -d \/ -f 3 | cut -d \" -f 1 | cut -d \? -f 1 >> ${HOME}/var.temp
+    kubectl exec -it deploy/$orch -n $namespace -- bash -c "grep -i httpUriTmplInline resources/*.bpmn" 2>/dev/null | grep -s rules | cut -d \/ -f 3 | cut -d \" -f 1 | cut -d \? -f 1 >> ${HOME}/var.temp
     
 	for serviceItem in `sort ${HOME}/var.temp | uniq`; do
 
@@ -55,18 +54,14 @@ input=${HOME}/serviceList.temp
 
 printf "______________________________________________________________________\n\nResultado:\n"
 
-    #checkVersion.sh $1 $np | cut -d \/ -f 4
-    versao=$(checkVersion.sh $1 $np | cut -d\: -f3)
-    echo $1:"$versao"
+. checkVersion.sh $1 $namespace | cut -d \/ -f 3
 
 while read -r line; do
 
     if [ "`echo $line | grep -i rules`" != "" ]; then
-        versao=$(checkVersion.sh $line-v1 s-$np | cut -d\: -f3)
-        echo $line:"$versao"
-        else
-        versao=$(checkVersion.sh $line $np | cut -d\: -f3)
-        echo $line:"$versao"
+        . checkVersion.sh $line-v1 s-$namespace | cut -d \/ -f 3
+    else
+        . checkVersion.sh $line $namespace | cut -d \/ -f 3
     fi
 
 done < "$input"
