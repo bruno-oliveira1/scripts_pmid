@@ -13,6 +13,7 @@
 #             Data: 04/2020
 #             Descrição: Primeira versão.
 
+namespace=$(echo "$2" | awk '{print tolower($0)}')
 if [ -z $namespace ]; then
 	if [ -f  $HOME/namespace.txt ]; then
 		namespace=$(< $HOME/namespace.txt)
@@ -22,7 +23,7 @@ if [ -z $namespace ]; then
 	fi
 fi
 
-if [ "`ls *serviceList.temp* | wc -l`" > 0 ]; then
+if [ -e ${HOME}/serviceList.temp ]; then
     rm ${HOME}/serviceList.temp ${HOME}/var.temp
 fi
 
@@ -54,14 +55,16 @@ input=${HOME}/serviceList.temp
 
 printf "______________________________________________________________________\n\nResultado:\n"
 
-. checkVersion.sh $1 $namespace | cut -d \/ -f 3
+checkVersion.sh $1 $namespace | cut -d \/ -f 3
 
 while read -r line; do
 
     if [ "`echo $line | grep -i rules`" != "" ]; then
-        . checkVersion.sh $line-v1 s-$namespace | cut -d \/ -f 3
+        versao=$(checkVersion.sh $line-v1 s-$namespace  | awk -F : '{print $3}')
+		echo -e "$line-v1 $versao"
     else
-        . checkVersion.sh $line $namespace | cut -d \/ -f 3
+        versao=$(checkVersion.sh $line $namespace  | awk -F : '{print $3}')
+		echo -e "$line $versao"
     fi
 
 done < "$input"
