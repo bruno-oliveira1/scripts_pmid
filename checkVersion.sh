@@ -18,8 +18,16 @@ else
 
 pod=$(echo "$1" | awk '{print tolower($0)}')
 checkVersion (){
-kubectl -n $namespace describe deploy $pod 2>/dev/null | grep -i Image || echo naoinstalado
+kubectl -n $namespace describe deploy $pod 2>/dev/null | grep -i Image || versao=naoinstalado
 }
 
-versao=$(checkVersion $pod $namespace  | awk -F : '{print $3}')
-echo -e "$pod $versao"
+checkVersion
+
+case "$versao" in
+        naoinstalado)
+		echo -e "$pod $versao"
+        ;;
+        *)
+        versao=$(checkVersion $pod $namespace  | awk -F : '{print $3}')
+		echo -e "$pod $versao"
+esac
