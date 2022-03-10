@@ -29,12 +29,12 @@ fi
 
 serviceList () {
 
-	orch=$1
+orch=$(echo "$1" | awk '{print tolower($0)}')
 
 	echo "recuperando steps do $orch..."
 
     #servicos convencionais
-	kubectl exec -it deploy/$orch -n $namespace -- bash -c "grep -i processid resources/*.bpmn" | cut -d \" -f 4 | sed -r 's/[A-Z]/-\L&/g' > ${HOME}/var.temp
+	kubectl exec -it deploy/$orch -n $namespace -- bash -c "grep -i processid resources/*.bpmn" 2>/dev/null | cut -d \" -f 4 | sed -r 's/[A-Z]/-\L&/g' > ${HOME}/var.temp
     #rules
     kubectl exec -it deploy/$orch -n $namespace -- bash -c "grep -i httpUriTmplInline resources/*.bpmn" 2>/dev/null | grep -s rules | cut -d \/ -f 3 | cut -d \" -f 1 | cut -d \? -f 1 >> ${HOME}/var.temp
     
@@ -55,7 +55,10 @@ input=${HOME}/serviceList.temp
 
 printf "______________________________________________________________________\n\nResultado:\n"
 
-checkVersion.sh $1 $namespace | cut -d \/ -f 3
+versao=$(checkVersion.sh $1 $namespace | awk -F ' ' '{print $2}')
+echo -e "$1 $versao" 
+
+if [ -e $input ]; then
 
 while read -r line; do
 
@@ -63,8 +66,12 @@ while read -r line; do
         versao=$(checkVersion.sh $line-v1 s-$namespace  | awk -F ' ' '{print $2}')
 		echo -e "$line-v1 $versao"
     else
-        versao=$(checkVersion.sh $line $namespace  | awk -F ' ' '{print $2}')
+        versao=$(checkVersion.sh $line $namespace 2> /dev/null | awk -F ' ' '{print $2}')
 		echo -e "$line $versao"
     fi
 
 done < "$input"
+
+else 
+exit
+fi
