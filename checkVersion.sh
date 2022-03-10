@@ -21,7 +21,7 @@ checkVersion (){
 kubectl -n $namespace describe deploy $pod 2>/dev/null | grep -i Image || versao=naoinstalado
 }
 
-checkVersion
+checkVersion > /dev/null
 
 case "$versao" in
         naoinstalado)
