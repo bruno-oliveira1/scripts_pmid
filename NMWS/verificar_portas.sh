@@ -7,11 +7,21 @@
 # google.com.br 443
 # facebook.com 443
 
-#echo "scanme.nmap.org 80
-#scanme.nmap.org 81
-#192.168.0.100 1" | (
+case $1 in 
+-u)
+  execucao="echo $2 $3"
+  ;;
+-p)
+  execucao="cat $2"
+  ;;
+-a)
+  execucao="cat $HOME/firewall.txt"
+  ;;
+*)
+echo "Parametro nao informado"
+esac
 
- cat firewall.txt | (
+$execucao | (
   TCP_TIMEOUT=3
   while read host port; do
     (CURPID=$BASHPID;
