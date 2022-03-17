@@ -1,11 +1,6 @@
 #!/bin/bash
 #Fonte https://stackoverflow.com/questions/23421917/bash-script-telnet-to-test-multiple-addresses-and-ports
 #Quem copiou e traduziu as mensagens de respostas e adaptou Bruno Oliveira - bruno.oliveira@engdb.com.br
-#Le o arquivo firewall.txt e com base nisso testa conectividade
-#Formato esperado pelo firewall.txt host porta um por linha
-#Ex:
-# google.com.br 443
-# facebook.com 443
 
 case $1 in 
 -u)
@@ -17,8 +12,11 @@ case $1 in
 -a)
   execucao="cat $HOME/firewall.txt"
   ;;
-*)
-echo "Parametro nao informado"
+*|help|--help)
+echo "Como usar"
+echo "-a lê os ips e portas que estão no arquivo $HOME/firewall.txt - Ex: verificar_portas.sh -a"
+echo "-p lê os ips e portas que estão no arquivo que vc informar o caminho - Ex: verificar_portas.sh -p /tmp/lista"
+echo "-u executa com host e porta únicos - Ex: verificar_portas.sh -u google.com 443"
 esac
 
 $execucao | (
