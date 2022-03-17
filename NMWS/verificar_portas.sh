@@ -1,5 +1,5 @@
 #!/bin/bash
-#Fonte https://stackoverflow.com/questions/23421917/bash-script-telnet-to-test-multiple-addresses-and-ports
+#Fonte: https://stackoverflow.com/questions/23421917/bash-script-telnet-to-test-multiple-addresses-and-ports
 #Quem copiou e traduziu as mensagens de respostas e adaptou Bruno Oliveira - bruno.oliveira@engdb.com.br
 
 case $1 in 
