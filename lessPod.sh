@@ -19,15 +19,6 @@
 #             Descrição: condição para o ambiente ser variável (caso não informe o ambiente será considerado o do namespace.txt)
 
 pod=$(echo "$1" | awk '{print tolower($0)}')
-namespace=$(echo "$2" | awk '{print tolower($0)}')
-
-if [ -z $namespace ]; then
-	if [ -f  $HOME/namespace.txt ]; then
-		namespace=$(< $HOME/namespace.txt)
-	else
-	echo "Ambiente nao informado e arquivo  $HOME/namespace.txt nao existe"
-	exit 1
-	fi
-fi
+namespace=$(getPods.sh $pod | awk '{print $1}')
 
 kubectl -n $namespace logs -f $pod | less 2>&-
