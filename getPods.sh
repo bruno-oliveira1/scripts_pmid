@@ -6,6 +6,7 @@
 #Baseado no trabalho de Heitor Bellini <heitor.bellini@engdb.com.br> e Flavio Moreira <flavio.moreira@engdb.com.br>
 #Migrado para gitlab e alterações feitas por Bruno Oliveira <bruno.oliveira2@engdb.com.br>
 
+
 getPods (){
 kubectl get pods -A | grep $namespace 2>/dev/null | grep $pod
 }
@@ -22,15 +23,15 @@ if [ -z $namespace ]; then
 	fi
 fi
 	case $namespace in
-		uta|uta2|uta3) 
+		uta|uta2|uta3)
 			namespace=$(sed 's/uta/uat/g' <<< $namespace)
 			getPods $pod $namespace
 			;;
-		tua|tua2|tua3) 
+		tua|tua2|tua3)
 			namespace=$(sed 's/tua/uat/g' <<< $namespace)
 			getPods $pod $namespace
 			;;
-		aut|aut2|aut3) 
+		aut|aut2|aut3)
 			namespace=$(sed 's/aut/uat/g' <<< $namespace)
 			getPods $pod $namespace
 			;;
@@ -38,9 +39,7 @@ fi
 			namespace=$(sed -e 's/uat1/uat/' -e 's/uta1/uat/g' -e 's/aut1/uat/g' -e 's/tua1/uat/g' <<< $namespace)
 			getPods $pod $namespace
 			;;
-		uat|uat2|uat3|prd|dev|s-uat|m-uat|f-uat|e-uat|s-uat2|m-uat2|f-uat2|e-uat2|s-uat3|m-uat3|f-uat3|e-uat3)
-			getPods $pod $namespace
-			;;
 		*)
-			echo "Ambiente informado diferente do esperado - Ex: uat, uat2, prd etc ..." 
+			getPods $pod $namespace
 	esac
+
