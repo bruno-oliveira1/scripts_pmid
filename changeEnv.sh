@@ -34,7 +34,7 @@ case $namespace in
         gcloud config set project tim-pmid-dev --user-output-enabled=false
         gcloud config set compute/region southamerica-east1 --user-output-enabled=false 
         gcloud container clusters get-credentials pmid-dev --region=southamerica-east1 --user-output-enabled=false
-        sed -i "1 s/^.*$/dev/" $HOME/namespace.txt || echo dev > $HOME/namespace.txt
+        sed -i "1 s/^.*$/dev/" $HOME/namespace.txt 2>/dev/null || echo dev > $HOME/namespace.txt
         echo "Você entrou no cluster DEV"
         ;;
 
@@ -42,7 +42,7 @@ case $namespace in
         gcloud config set project tim-pmid-fqa --user-output-enabled=false                                                                                            
 	gcloud config set compute/region southamerica-east1 --user-output-enabled=false                                                                                           
 	gcloud container clusters get-credentials tim-pmid-uat --region southamerica-east1 --project tim-pmid-fqa --user-output-enabled=false
-        sed -i "1 s/^.*$/uat/" $HOME/namespace.txt || echo uat > $HOME/namespace.txt
+        sed -i "1 s/^.*$/uat/" $HOME/namespace.txt 2>/dev/null || echo uat > $HOME/namespace.txt
 	echo "Você entrou no cluster FQA"
         ;;
 
@@ -50,8 +50,7 @@ case $namespace in
 	gcloud config set project tim-pmid-prd --user-output-enabled=false
 	gcloud config set compute/region southamerica-east1 --user-output-enabled=false
 	gcloud container clusters get-credentials pmid-prod --region=southamerica-east1 --user-output-enabled=false
-        sed -i "1 s/^.*$/prd/" $HOME/namespace.txt
-        sed -i "1 s/^.*$/prd/" $HOME/namespace.txt || echo prd > $HOME/namespace.txt
+        sed -i "1 s/^.*$/prd/" $HOME/namespace.txt 2>/dev/null || echo prd > $HOME/namespace.txt
 	echo "Você entrou no cluster PRD"
         ;;
 
