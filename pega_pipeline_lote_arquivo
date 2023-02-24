@@ -1,6 +1,6 @@
 #!/bin/bash
 servicos=( $(cat $1) )
-token=SEUTOKENAQUI
+token=$(cat $HOME/token)
 # $2 é o namespace usado. 
 cont=0
 

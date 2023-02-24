@@ -1,6 +1,6 @@
 #!/bin/bash
 servico=$1
-token=SEUTOKENAQUI
+token=$(cat $HOME/token)
 
 versao=$(checkVersion.sh $servico $2 | awk -F ' ' '{print $2}')
 nome=( $(curl -s --header "Authorization: Bearer $token" -X GET https://gitlab.engdb.com.br/api/v4/projects?search=$servico | jq '.[].name' |  sed 's/"//g' ) )
