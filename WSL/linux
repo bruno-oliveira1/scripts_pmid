@@ -1,0 +1,46 @@
+#!/bin/bash
+sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get install -y vim bash-completion dos2unix curl apt-transport-https ca-certificates gnupg openssh-client git keychain jq rpm
+
+#Instala o kubectl
+echo Instalando kubectl
+curl -LO https://dl.k8s.io/release/v1.22.15/bin/linux/amd64/kubectl -s 
+sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+#Instale o GCP
+echo Instalando GCP
+echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - && sudo apt-get update && sudo apt-get install google-cloud-sdk google-cloud-cli-gke-gcloud-auth-plugin -y
+
+#Execute com usuário normal (Não privilegiado - Não pode ser root ou sudo )
+echo
+echo Copie e cole a url abaixo no navegador e logue com a sua conta @engdb.com.br
+echo
+echo Cole o código retornado no Linux
+echo
+gcloud auth login --no-launch-browser 
+echo
+echo Acesse https://gitlab.engdb.com.br/profile/keys
+echo
+
+echo Gerando uma chave ssh:
+echo Sera solicitado que seja definida uma senha pode ser uma nova ou a mesma que vc definiu para o usuario
+ssh-keygen -t rsa -b 4096 -f $HOME/.ssh/id_rsa 
+
+echo Copie e cole no site aberto anteriormente
+cat .ssh/id_rsa.pub
+
+#Criando o arquivo config 
+cat << EOF > $HOME/.ssh/config 
+Host gitlab.engdb.com.br
+PreferredAuthentications publickey
+IdentityFile ~/.ssh/id_rsa
+EOF
+
+echo Coloque yes depois salvar a chave no site
+ssh -T git@gitlab.engdb.com.br
+
+#Adicionando ao bashrc 
+cat << 'EOF' >> $HOME/.bashrc
+export PATH="$HOME/scripts:$PATH"
+export USE_GKE_GCLOUD_AUTH_PLUGIN=False
+EOF
+echo Digite a senha definida anteriormente && echo Clonando os scripts && git clone git@gitlab.engdb.com.br:bdasilvaol/scripts.git && rm -rf $HOME/linux
