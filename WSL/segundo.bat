@@ -26,5 +26,3 @@ echo Apagando arquivos baixados
 del C:\debian.appx
 del C:\wsl_update_x64.msi
 timeout /t 5
-del %homepath%\Downloads\primeiro.bat
-del %homepath%\Downloads\segundo.bat
