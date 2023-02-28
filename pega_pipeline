@@ -11,13 +11,13 @@ ids=( $(curl -s --header "Authorization: Bearer $token" -X GET https://gitlab.en
 i=0
 while [ $i -lt ${#names[@]} ]
 do
-    if [ ${servicos[$cont]} == ${nome[$i]} ]; then 
+    if [ $servico == ${nome[$i]} ]; then 
         if [[ ${names2[$i]} = nio ]]; then
-        versao=$(checkVersion.sh ${servicos[$cont]} $2 | awk -F ' ' '{print $2}')
+        versao=$(checkVersion.sh $servico $2 | awk -F ' ' '{print $2}')
         elif [[ ${names2[$i]} = ejb ]]; then 
-        versao=$(checkVersion.sh ${servicos[$cont]} e-$2 | awk -F ' ' '{print $2}')
+        versao=$(checkVersion.sh $servico e-$2 | awk -F ' ' '{print $2}')
         elif [[ ${names2[$i]} = brms ]]; then
-        versao=$(checkVersion.sh ${servicos[$cont]} s-$2 | awk -F ' ' '{print $2}')
+        versao=$(checkVersion.sh $servico s-$2 | awk -F ' ' '{print $2}')
         fi
     fi
 projeto=$(echo ${ids[$i]})
