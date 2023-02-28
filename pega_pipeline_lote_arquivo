@@ -21,7 +21,12 @@ do
         elif [[ ${names2[$i]} = ejb ]]; then 
         versao=$(checkVersion.sh ${servicos[$cont]} e-$2 | awk -F ' ' '{print $2}')
         elif [[ ${names2[$i]} = brms ]]; then
-        versao=$(checkVersion.sh ${servicos[$cont]} s-$2 | awk -F ' ' '{print $2}')
+		case $2 in
+			uat2|uat3)
+				versao=$(checkVersion.sh ${servicos[$cont]} s-uat | awk -F ' ' '{print $2}');;
+			*)
+				versao=$(checkVersion.sh ${servicos[$cont]} s-$2 | awk -F ' ' '{print $2}');;
+		esac
         fi
     fi
 projeto=$(echo ${ids[$i]})
