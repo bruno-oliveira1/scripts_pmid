@@ -37,6 +37,9 @@ orch=$(echo "$1" | awk '{print tolower($0)}')
 	kubectl exec -it deploy/$orch -n $namespace -- bash -c "grep -i processid resources/*.bpmn" 2>/dev/null | cut -d \" -f 4 | sed -r 's/[A-Z]/-\L&/g' > ${HOME}/var.temp
     #rules
     kubectl exec -it deploy/$orch -n $namespace -- bash -c "grep -i httpUriTmplInline resources/*.bpmn" 2>/dev/null | grep -s rules | cut -d \/ -f 3 | cut -d \" -f 1 | cut -d \? -f 1 >> ${HOME}/var.temp
+    #servicos async
+    kubectl exec -it deploy/$orch -n $namespace -- bash -c "grep -i rabbitRoutingKey resources/*.bpmn" 2>/dev/null | cut -d \" -f 4 | cut -d\_ -f2 |  sed -r 's/[A-Z]/-\L&/g' >> ${HOME}/var.temp
+
     
 	for serviceItem in `sort ${HOME}/var.temp | uniq`; do
 
