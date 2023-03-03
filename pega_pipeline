@@ -30,8 +30,8 @@ i=$(( $i + 1 ))
 done
 
 
-ver=( $(curl -s  --header "Authorization: Bearer $token" -X GET https://gitlab.engdb.com.br/api/v4/projects/$projeto/pipelines | jq '.[].ref' |  sed 's/"//g') )
-pipeline=( $(curl -s  --header "Authorization: Bearer $token" -X GET https://gitlab.engdb.com.br/api/v4/projects/$projeto/pipelines | jq '.[].web_url' |   sed 's/"//g') )
+ver=( $(curl -s  --header "Authorization: Bearer $token" -X GET https://gitlab.engdb.com.br/api/v4/projects/$projeto/pipelines?per_page=300 | jq '.[].ref' |  sed 's/"//g') )
+pipeline=( $(curl -s  --header "Authorization: Bearer $token" -X GET https://gitlab.engdb.com.br/api/v4/projects/$projeto/pipelines?per_page=300 | jq '.[].web_url' |   sed 's/"//g') )
 
 int=0
 if [ "$versao" != naoinstalado ];
