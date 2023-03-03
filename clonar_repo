@@ -1,6 +1,6 @@
 #!/bin/bash
-tokenfull="Authorization: Bearer zxjQ_aNsPb8qwkeK8UDx"
 token=$(cat $HOME/token)
+tokenfull="Authorization: Bearer $token"
 
 todos () {
 	pag=$(curl -s --head  --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/groups/"${id[$int]}"/projects?per_page=100 | awk -F "x-total-pages: " '{print $2}' | awk NF | sed 's/\r//')
