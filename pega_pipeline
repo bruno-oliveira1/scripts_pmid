@@ -17,7 +17,12 @@ do
         elif [[ ${names2[$i]} = ejb ]]; then 
         versao=$(checkVersion.sh $servico e-$2 | awk -F ' ' '{print $2}')
         elif [[ ${names2[$i]} = brms ]]; then
-        versao=$(checkVersion.sh $servico s-$2 | awk -F ' ' '{print $2}')
+		case $2 in
+			uat2|uat3)
+				versao=$(checkVersion.sh $servico s-uat | awk -F ' ' '{print $2}');;
+			*)
+				versao=$(checkVersion.sh $servico s-$2 | awk -F ' ' '{print $2}');;
+		esac
         fi
     fi
 projeto=$(echo ${ids[$i]})
@@ -29,8 +34,23 @@ ver=( $(curl -s  --header "Authorization: Bearer $token" -X GET https://gitlab.e
 pipeline=( $(curl -s  --header "Authorization: Bearer $token" -X GET https://gitlab.engdb.com.br/api/v4/projects/$projeto/pipelines | jq '.[].web_url' |   sed 's/"//g') )
 
 int=0
-while [ "$versao" != "${ver[$int]}" ]
-  do
-  int=$(( $int + 1 ))
-done
+if [ "$versao" != naoinstalado ];
+    then
+        while [ "$int" -lt ${#ver[@]} ]
+        do
+            if [ "$versao" != "${ver[$int]}" ];
+            then
+            int=$(( $int + 1 ))
+            else 
+            break 
+            fi
+        done
+fi
+
+if [ "$versao" != naoinstalado ];
+then
 echo  "Serviço: $servico | Versão: $versao | Pipeline: ${pipeline[$int]}" 
+else
+echo "$servico $versao"
+fi
+cont=$(( $cont + 1 ))
