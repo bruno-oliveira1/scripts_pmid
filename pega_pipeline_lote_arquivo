@@ -1,16 +1,17 @@
 #!/bin/bash
 servicos=( $(cat $1) )
 token=$(cat $HOME/token)
+tokenfull="Authorization: Bearer $token"
 # $2 é o namespace usado. 
 cont=0
 
 while  [ $cont -lt ${#servicos[@]} ]
 do
 
-nome=( $(curl -s --header "Authorization: Bearer $token" -X GET https://gitlab.engdb.com.br/api/v4/projects?search=${servicos[$cont]} | jq '.[].name' |  sed 's/"//g' ) )
-names=( $(curl -s --header "Authorization: Bearer $token" -X GET https://gitlab.engdb.com.br/api/v4/projects?search=${servicos[$cont]} | jq '.[].path_with_namespace' |  sed 's/"//g' | awk -F/ '{print $1}' ) ) 
-names2=( $(curl -s --header "Authorization: Bearer $token" -X GET https://gitlab.engdb.com.br/api/v4/projects?search=${servicos[$cont]} | jq '.[].path_with_namespace' |  sed 's/"//g' | awk -F/ '{print $2}' ) ) 
-ids=( $(curl -s --header "Authorization: Bearer $token" -X GET https://gitlab.engdb.com.br/api/v4/projects?search=${servicos[$cont]} | jq '.[].id' ) ) 
+nome=( $(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects?search=${servicos[$cont]} | jq '.[].name' |  sed 's/"//g' ) )
+names=( $(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects?search=${servicos[$cont]} | jq '.[].path_with_namespace' |  sed 's/"//g' | awk -F/ '{print $1}' ) ) 
+names2=( $(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects?search=${servicos[$cont]} | jq '.[].path_with_namespace' |  sed 's/"//g' | awk -F/ '{print $2}' ) ) 
+ids=( $(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects?search=${servicos[$cont]} | jq '.[].id' ) ) 
 
 i=0
 while [ $i -lt ${#names[@]} ]
@@ -33,8 +34,8 @@ projeto=$(echo ${ids[$i]})
 i=$(( $i + 1 ))
 done
 
-ver=( $(curl -s  --header "Authorization: Bearer $token" -X GET https://gitlab.engdb.com.br/api/v4/projects/$projeto/pipelines?per_page=300 | jq '.[].ref' |  sed 's/"//g') )
-pipeline=( $(curl -s  --header "Authorization: Bearer $token" -X GET https://gitlab.engdb.com.br/api/v4/projects/$projeto/pipelines?per_page=300 | jq '.[].web_url' |   sed 's/"//g') )
+ver=( $(curl -s  --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects/$projeto/pipelines?per_page=300 | jq '.[].ref' |  sed 's/"//g') )
+pipeline=( $(curl -s  --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects/$projeto/pipelines?per_page=300 | jq '.[].web_url' |   sed 's/"//g') )
 
 int=0
 if [ "$versao" != naoinstalado ];
