@@ -1,0 +1,2 @@
+#!/bin/bash
+kubectl logs --tail=900000 -n $2 -l app.kubernetes.io/instance=$1 | less

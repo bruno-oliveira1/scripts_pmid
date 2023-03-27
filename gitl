@@ -1,0 +1,166 @@
+#!/bin/bash
+#Lê o arquivo token no home do seu usuário
+token=$(cat $HOME/token)
+#Incrementa com o padrão esperado pelo GitLab
+tokenfull="Authorization: Bearer $token"
+#Diretório onde está clonado os serviços
+diretorio="$HOME/gitlab/pmid/nio/"
+diretorio2="$HOME/pmid/teste/nio/"
+#Data no formato ANO-MES-DIA
+data=$(date +"%Y-%m-%d")
+
+#Função do DE PARA - Coleta o que vai ser alterado e para o que vai ser alterado e o número da INF
+de_para () {
+    read -p "De: " de
+    read -p "Para: " para
+    read -p "Numero da INF: " inf
+    filtro=$de
+}
+
+#Função do DE PARA, que faz as alterações
+de_para1 () {
+    #Faz as alterações nos envs
+    changes=$(sed -i "s/$de/$para/g w /dev/stdout" .env.*)
+    #Valida se os arquivos foram alterados, ou seja se a string $de existe dentro do arquivo
+    if [[ "$changes" != "" ]]; then
+        #Se sim imprime na tela e no arquivo de saida que fica no HOME do seu usuário o nome do serviço
+        echo "Servico ${pmid[$i]}" | tee -a "$HOME"/INF_"$inf"_"$data"
+        #Imprime na tela e no arquivo de saida o DE PARA que foi feito
+        echo "De: $de Para: $para" | tee -a "$HOME"/INF_"$inf"_"$data"
+        #Imprime na tela e no arquivo de saida os arquivos env que foram alterados
+        echo Arquivos alterados | tee -a "$HOME"/INF_"$inf"_"$data"
+        alterados[$i]=$(git diff --name-only)
+        git diff --name-only | tee -a "$HOME"/INF_"$inf"_"$data"
+        #Pega a última tag do serviço
+        ultima_tag[$i]=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+        #ultima_tag=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+        #Imprime na tela e no arquivo de saida a última tag do serviço
+        echo Ultima tag local ${ultima_tag[$i]} | tee -a "$HOME"/INF_"$inf"_"$data"
+        #Incrementa 1 ao valor da tag - Ex: Para tag 1.0.0.0 o valor será 1.0.0.1
+        tag_mais_um=$(echo ${ultima_tag[$i]} | awk -F '.' '{print $4+1}')
+        nova_tag[$i]=$(echo ${ultima_tag[$i]} | sed "s/\.[0-9]*$/.$tag_mais_um/")
+        #nova_tag=$(echo ${ultima_tag[$i]} | sed "s/\.[0-9]*$/.$tag_mais_um/")
+        #Imprime na tela e no arquivo de saida a nova tag do serviço
+        echo Tag gerada $nova_tag | tee -a "$HOME"/INF_"$inf"_"$data"
+        #Faz os commits gera a nova tag e envia tudo para o GitLab
+        git add .
+        git commit -m "INF $inf"
+        git push
+        git tag $nova_tag
+        git push --tags
+        i=$(( $i + 1 ))
+    fi
+}
+
+#Função que deleta o valor informado
+deleta () {
+    read -p "Informe o que eh para deletar: " deletar
+    read -p "Numero da INF: " inf
+    filtro=$deletar
+}
+
+#Função que deleta o valor informado
+deleta1 () {
+    #Tem essa trava para não alterar os arquivos de prod.
+    arquivos=( $(ls .env.* | grep -v prd) )
+    #Valida se a string $deletar existe no arquivo env e se existir deleta a mesma caso não exista os comandos que vem depois do if não são executados
+    for file in "${arquivos[@]}"; do
+        sed "/$deletar/d" -i "$file"
+    done
+    validacao=$(git diff --name-only)
+    if [[ $validacao != "" ]]; then
+        echo "Servico ${pmid[$i]}" | tee -a "$HOME"/INF_"$inf"_"$data"
+        #Imprime na tela e no arquivo de saida os arquivos env que foram alterados
+        echo Arquivos alterados | tee -a "$HOME"/INF_"$inf"_"$data"
+        alterados[$i]=$(git diff --name-only)
+        git diff --name-only | tee -a "$HOME"/INF_"$inf"_"$data"
+        #ultima_tag[$i]=
+        #Pega a última tag do serviço
+        ultima_tag[$i]=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+        echo Ultima tag local "${ultima_tag[$i]}" | tee -a "$HOME"/INF_"$inf"_"$data"
+        #Incrementa 1 ao valor da tag - Ex: Para tag 1.0.0.0 o valor será 1.0.0.1
+        tag_mais_um=$(echo "${ultima_tag[$i]}" | awk -F '.' '{print $4+1}')
+        nova_tag[$i]=$(echo "${ultima_tag[$i]}" | sed "s/\.[0-9]*$/.$tag_mais_um/")
+        #Imprime na tela e no arquivo de saida a nova tag do serviço
+        echo Tag gerada "${nova_tag[$i]}" | tee -a "$HOME"/INF_"$inf"_"$data"
+        #Faz os commits gera a nova tag e envia tudo para o GitLab
+        pwd
+        git add .
+        git commit -m "INF $inf"
+        pwd
+        git push
+        git tag "${nova_tag[$i]}"
+        git push --tags
+        pwd
+    fi
+}
+
+#Função responsável por apertar o play do deploy da pipeline
+play () {
+    id=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects?search=$servico | jq '.[].id' )
+    pipeline=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects/$id/pipelines?per_page=300 | jq --arg versao "$versao" '.[] | select(.ref == $versao) | .id' )
+    exec=( $(echo ${alterados[$i]}) )
+    b=0
+    while [ $b -lt ${#exec[@]} ]
+    do
+        deploy="${exec[$i]} | sed 's/.env.//g'"
+        job=$(curl -s --request GET --header "$tokenfull" https://gitlab.engdb.com.br/api/v4/projects/$id/pipelines/$pipeline/jobs  | jq --arg deploy "$deploy" '.[] | select(.name == "deploy_'"$deploy"'") | .id' )
+        curl -s --request POST --header "$tokenfull" "https://gitlab.engdb.com.br/api/v4/projects/$id/jobs/$job/play" > /dev/null
+    done
+}
+
+
+j=0
+while [ $j == "0" ]
+do
+    echo "Informe o tipo de função que deseja utilizar"
+    echo "Para usar a função DE PARA informe depara"
+    echo "Para usar a função DELETAR informe del"
+    read j
+    if [[ $j == "del" ]]; then
+        acao=deleta
+        deleta
+        elif [[ $j == "depara" ]]; then
+        acao=de_para
+        de_para
+    else
+        echo "Tente novamente"
+        j=0
+    fi
+done
+
+echo "Informe a senha da chave SSH"
+eval $(keychain --eval id_rsa)
+
+#pmid=( $(grep -Rl $filtro $diretorio  | cut -d\/ -f7 | sort -u | grep -v teste ) )
+pmid=( $(grep -Rl $filtro $diretorio2  | cut -d\/ -f7 | sort -u ) )
+ultima_tag=()
+nova_tag=()
+arquivos=()
+alterados=()
+servicoalt=()
+i=0
+while [ $i -lt ${#pmid[@]} ]
+do
+    #cd $diretorio${pmid[$i]}
+    if [[ "$acao" == "de_para" ]]; then
+        de_para1
+        servicoalt[$i]="${pmid[$i]}"
+        elif [[ "$acao" == "deleta" ]]; then
+        deleta1
+        servicoalt[$i]="${pmid[$i]}"
+    fi
+    i=$(( $i + 1 ))
+done
+#sleep 600
+sleep 300
+i=0
+while [ $i -lt ${#servicoalt[@]} ]; then 
+do
+    servico="${servicoalt[$i]}"
+    versao="${nova_tag[$i]}"
+    play
+    i=$(( $i + 1 ))
+done
+
+echo "Caso precise o arquivo do log "$HOME"/INF_"$inf"_"$data""

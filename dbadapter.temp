@@ -1,0 +1,82 @@
+Name:                   u-ticket-clarify-sn-v1
+Namespace:              uat3
+CreationTimestamp:      Fri, 23 Jul 2021 09:39:30 -0300
+Labels:                 app.kubernetes.io/engine=v2.21.2
+                        app.kubernetes.io/instance=u-ticket-clarify-sn-v1
+                        app.kubernetes.io/managed-by=Tiller
+                        app.kubernetes.io/name=gone
+                        app.kubernetes.io/runtime=pipeline-v2
+                        helm.sh/chart=gone-1.1.0
+Annotations:            deployment.kubernetes.io/revision: 7
+Selector:               app.kubernetes.io/instance=u-ticket-clarify-sn-v1,app.kubernetes.io/name=gone,app.kubernetes.io/runtime=pipeline-v2
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  0 max unavailable, 1 max surge
+Pod Template:
+  Labels:       app.kubernetes.io/instance=u-ticket-clarify-sn-v1
+                app.kubernetes.io/name=gone
+                app.kubernetes.io/runtime=pipeline-v2
+  Annotations:  sidecar.istio.io/rewriteAppHTTPProbers: true
+  Containers:
+   io:
+    Image:       southamerica-east1-docker.pkg.dev/tim-pmid-fqa/timfqa/u-ticket-clarify-sn-v1:1.0.0.27
+    Ports:       8080/TCP, 8081/TCP
+    Host Ports:  0/TCP, 0/TCP
+    Limits:
+      cpu:     500m
+      memory:  500Mi
+    Requests:
+      cpu:      100m
+      memory:   100Mi
+    Liveness:   http-get http://:8080/health/check delay=40s timeout=1s period=5s #success=1 #failure=3
+    Readiness:  http-get http://:8080/health/check delay=40s timeout=1s period=5s #success=1 #failure=3
+    Environment:
+      HTTP_PORT:                 8080
+      GRPC_PORT:                 8081
+      DB_HOST:                   192.168.84.146
+      DB_PORT:                   1525
+      DB_SCHEMA:                 xe
+      DRIVER_DB:                 oracle.jdbc.driver.OracleDriver
+      ENV:                       uat3
+      ENV_AFFINITY:              billing=fqa
+      ENV_TOLERATION:            billing=fqa
+      HOST_ALIAS_10_114_128_35:  oamqa.internal.timbrasil.com.br
+      HOST_ALIAS_10_114_192_41:  wso2fqa.internal.timbrasil.com.br
+      HOST_ALIAS_10_161_0_31:    oamwlprd.internal.timbrasil.com.br
+      HOST_ALIAS_10_161_0_89:    api.internal.timbrasil.com.br
+      JAVA_ADD_OPTS:             -Doracle.jdbc.timezoneAsRegion=false
+      JAVA_OPTS:                 -Xms400m -Xmx400m
+      LIM_CPU:                   500m
+      LIM_MEMORY:                500Mi
+      LOG_LEVEL:                 dev
+      MAPPERS_PATH:              /etc/app/resources/mappers
+      MAX_REPLICA_COUNT:         1
+      OAM_ACCESS_TOKEN_URL:      https://oamqa.internal.timbrasil.com.br/ms_oauth/oauth2/endpoints/oauthservice/tokens
+      OAM_CLIENT_ID:             pmid
+      OAM_CLIENT_SECRET:         N8D964nELyyhy8WT
+      OAM_GRANT_TYPE:            client_credentials
+      OAM_PMID_CONSUMER:         pmid-integration
+      OAM_REQUEST_TIMEOUT:       5000
+      OAM_SCOPE:                 VPN.TokenManagement_PTN
+      OAM_TOKEN_EXPIRES:         3.3e+06
+      OAM_VALIDATE_TOKEN_URL:    https://wso2fqa.internal.timbrasil.com.br/partner/tokenManagement/v1/tokens/validation
+      PASSWORD_DB:               INFOBUS
+      REDIS_HOST:                10.240.223.147
+      REDIS_PORT:                6379
+      REPLICA_COUNT:             1
+      REQ_CPU:                   100m
+      REQ_MEMORY:                100Mi
+      REURI:                     /green|/uat1|/uat2|/uat3|/internally|/oauth|/auth
+      TZ:                        America/Sao_Paulo
+      USER_DB:                   INFOBUS
+    Mounts:                      <none>
+  Volumes:                       <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Progressing    True    NewReplicaSetAvailable
+  Available      True    MinimumReplicasAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   u-ticket-clarify-sn-v1-7bffbc9557 (1/1 replicas created)
+Events:          <none>

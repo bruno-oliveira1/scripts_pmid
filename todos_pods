@@ -1,0 +1,2 @@
+#!/bin/bash
+kubectl -n $2 logs -f --max-log-requests=10000000000 -l app.kubernetes.io/instance=$1

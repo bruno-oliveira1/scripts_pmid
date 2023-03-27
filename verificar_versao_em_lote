@@ -1,0 +1,44 @@
+#!/bin/bash
+
+case $1 in 
+-p)
+  execucao="cat $2"
+  ;;
+-a)
+  pacotes=( $(cat $HOME/lista.txt) )
+  ;;
+*|help|--help)
+echo "Como usar"
+echo "-a lê os servicos que estão no arquivo $HOME/lista.txt - Ex: verificar_versao_em_lote.sh -a"
+echo "-p lê os servicos que estão no arquivo que vc informar o caminho - Ex: verificar_versao_em_lote.sh -p /tmp/lista"
+echo "-u executa com serviço único - Ex: verificar_versao_em_lote.sh -u r-access-info-v1"
+exit
+esac
+
+versao () {
+int=0
+cont=0
+namespace=( $(echo uat uat2 uat3 prd) ) 
+changeEnv.sh fqa > /dev/null
+
+while [ $cont -lt ${#namespace[@]} ]
+if [ prd != ${namespace[$cont]} ]; then
+while [ $int -lt ${#pacotes[@]} ]
+do
+  echo "Versao em ${namespace[$cont]} eh "
+	checkVersion.sh ${pacotes[$int]} ${namespace[$cont]}
+int=$(( $int + 1 ))
+done
+else 
+changeEnv.sh prd > /dev/null
+while [ $int -lt ${#pacotes[@]} ]
+do
+  echo "Versao em ${namespace[$cont]} eh "
+	checkVersion.sh ${pacotes[$int]} ${namespace[$cont]}
+int=$(( $int + 1 ))
+done
+fi
+cont=$(( $cont + 1 ))
+}
+
+versao

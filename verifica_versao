@@ -1,0 +1,29 @@
+#!/bin/bash
+
+#pacote=orch-u-customer-information-v1
+pacote=$1
+
+changeEnv.sh prd &> /dev/null
+prd=$(checkVersion.sh $pacote prd | cut -d: -f3)
+
+changeEnv.sh fqa &> /dev/null
+uat=$(checkVersion.sh $pacote uat | cut -d: -f3)
+uat2=$(checkVersion.sh $pacote uat2 | cut -d: -f3)
+uat3=$(checkVersion.sh $pacote uat3 | cut -d: -f3)
+
+uatv=( $(echo $uat $uat2 $uat3) )
+uat=( $(echo uat uat2 uat3) )
+
+int=0
+
+while [ $int -lt ${#uatv[@]} ]
+do
+case "${uatv[$int]}" in
+                $prd)
+                echo "prd $prd é == ${uat[$int]} ${uatv[$int]}"
+                ;;
+                *)
+                echo "prd $prd é != ${uat[$int]} ${uatv[$int]}"
+esac
+int=$(( $int + 1 ))
+done    

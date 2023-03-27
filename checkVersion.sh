@@ -18,7 +18,7 @@ else
 
 pod=$(echo "$1" | awk '{print tolower($0)}')
 checkVersion (){
-	kubectl -n $namespace describe deploy $pod 2>/dev/null | grep -i Image && ambiente=$namespace || kubectl -n m-$namespace describe deploy $pod 2>/dev/null | grep -i Image && ambiente=$(echo m-$namespace) || kubectl -n s-$namespace describe deploy $pod 2>/dev/null | grep -i Image && ambiente=$(echo s-$namespace) || kubectl -n e-$namespace describe deploy $pod 2>/dev/null | grep -i Image && ambiente=$(echo e-$namespace) || versao=naoinstalado
+	kubectl -n $namespace describe deploy $pod 2>/dev/null | grep -i Image || kubectl -n m-$namespace describe deploy $pod 2>/dev/null | grep -i Image || kubectl -n s-$namespace describe deploy $pod 2>/dev/null | grep -i Image || kubectl -n e-$namespace describe deploy $pod 2>/dev/null | grep -i Image || versao=naoinstalado
 }
 
 checkVersion > /dev/null
