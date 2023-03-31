@@ -55,11 +55,11 @@ de_para1() {
     elif [[ $envm != "" && -e $envm ]]; then
         changes=$(sed -i "s/$de/$para/g w /dev/stdout" $envm)
     else
-        arquivos=($(ls .env.* | grep -v -E '.env.dev|.env.st|m-*'))
+        arquivos=($(ls .env.* | grep -v -E '.env.dev|.env.prd|.env.m-prd|.env.st|m-*'))
         if [[ "${arquivos[@]}" != "" ]]; then
             changes=$(sed -i "s/$de/$para/g w /dev/stdout" ${arquivos[@]})
         else
-            arquivos=($(ls .env.* | grep -v -E '.env.dev|.env.st'))
+            arquivos=($(ls .env.* | grep -v -E '.env.dev|.env.prd|.env.m-prd|.env.st'))
             if [[ "${arquivos[@]}" != "" ]]; then
                 changes=$(sed -i "s/$de/$para/g w /dev/stdout" ${arquivos[@]})
             fi
@@ -104,13 +104,13 @@ deleta() {
 
 #Função que deleta o valor informado
 deleta1() {
-    arquivos=($(ls .env.* | grep -v -E '.env.dev|.env.st|m-*'))
+    arquivos=($(ls .env.* | grep -v -E '.env.dev|.env.prd|.env.m-prd|.env.st|m-*'))
     if [[ "${arquivos[@]}" != "" ]]; then
         for file in "${arquivos[@]}"; do
             sed "/$deletar/d" -i "$file"
         done
     else
-        arquivos=($(ls .env.* | grep -v -E '.env.dev|.env.st'))
+        arquivos=($(ls .env.* | grep -v -E '.env.dev|.env.prd|.env.m-prd|.env.st'))
         if [[ "${arquivos[@]}" != "" ]]; then
             for file in "${arquivos[@]}"; do
                 sed "/$deletar/d" -i "$file"
@@ -204,8 +204,8 @@ else
     eval $(keychain --eval id_rsa)
 fi
 
-#pmid=( $(grep -Rl $filtro $diretorio  | cut -d\/ -f7 | sort -u | grep -v teste ) )
-pmid=($(grep -Rl $filtro $diretorio2 | cut -d\/ -f7 | sort -u))
+pmid=( $(grep -Rl $filtro $diretorio  | cut -d\/ -f7 | sort -u | grep -v teste ) )
+#pmid=($(grep -Rl $filtro $diretorio2 | cut -d\/ -f7 | sort -u))
 ultima_tag=()
 nova_tag=()
 arquivos=()
@@ -215,8 +215,8 @@ servicoalt=()
 #Primeiro loop. Verifica o que tem que ser alterado e altera.
 i=0
 while [ $i -lt ${#pmid[@]} ]; do
-    #cd $diretorio${pmid[$i]}
-    cd $diretorio2${pmid[$i]}
+    cd $diretorio${pmid[$i]}
+    #cd $diretorio2${pmid[$i]}
     git pull >/dev/null
     if [[ "$acao" == "de_para" ]]; then
         de_para1
