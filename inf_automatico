@@ -159,7 +159,7 @@ espec_env() {
 ##Função responsável por apertar o play do deploy da pipeline
 play() {
     id=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects?search=$servico | jq --arg tipo "$tipo" --arg servico "$servico" '.[] | select(.namespace.name == $tipo and .name == $servico) | .id')
-    pipeline=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects/$id/pipelines?per_page=300 | jq --arg versao "$versao" '.[] | select(.ref == $versao) | .id' | head -n 1)
+    pipeline=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects/$id/pipelines?per_page=300 | jq --arg versao "$versao" '.[] | select(.ref == $versao) | .id')
     echo Pipeline gerada | tee -a "$HOME"/INF_"$inf"_"$data"
     echo "https://gitlab.engdb.com.br/pmid/$tipo/$servico/-/pipelines/$pipeline" | tee -a "$HOME"/INF_"$inf"_"$data"
     if [[ $resp == "s" ]]; then
