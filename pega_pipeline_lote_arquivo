@@ -1,7 +1,14 @@
 #!/bin/bash
-servicos=( $(cat $1) )
-token=$(cat $HOME/token)
+token=$(cat $HOME/token 2>/dev/null)
+if [[ $token == "" ]]; then
+    echo "Eh necessario ter um token criado no GitLab que o mesmo esteja dentro do arquivo $HOME/token"
+    echo "Para que esse script funcione"
+    echo 'Ex: cat $HOME/token'
+    echo 'pqamgereorppreq'
+    exit 1
+fi
 tokenfull="Authorization: Bearer $token"
+servicos=( $(cat $1) )
 # $2 é o namespace usado. 
 cont=0
 
