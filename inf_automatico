@@ -63,11 +63,11 @@ de_para1() {
     elif [[ $envm != "" && -e $envm ]]; then
         changes=$(sed -i "s/$de/$para/g w /dev/stdout" $envm)
     else
-        arquivos=($(ls .env.* | grep -v -E '.env.dev|.env.prd|.env.m-prd|.env.st|m-*'))
+        arquivos=($(ls .env.* | grep -v -E '.env.green|.env.dev|.env.prd|.env.m-prd|.env.st|m-*'))
         if [[ "${arquivos[@]}" != "" ]]; then
             changes=$(sed -i "s/$de/$para/g w /dev/stdout" ${arquivos[@]})
         else
-            arquivos=($(ls .env.* | grep -v -E '.env.dev|.env.prd|.env.m-prd|.env.st'))
+            arquivos=($(ls .env.* | grep -v -E '.env.green|.env.dev|.env.prd|.env.m-prd|.env.st'))
             if [[ "${arquivos[@]}" != "" ]]; then
                 changes=$(sed -i "s/$de/$para/g w /dev/stdout" ${arquivos[@]})
             fi
