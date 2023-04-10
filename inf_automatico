@@ -2,222 +2,232 @@
 #Lê o arquivo token no home do seu usuário
 token=$(cat $HOME/token 2>/dev/null)
 if [[ $token == "" ]]; then
-    echo "Eh necessario ter um token criado no GitLab que o mesmo esteja dentro do arquivo $HOME/token"
-    echo "Para que esse script funcione"
-    echo 'Ex: cat $HOME/token'
-    echo 'pqamgereorppreq'
-    exit 1
+  echo "Eh necessario ter um token criado no GitLab que o mesmo esteja dentro do arquivo $HOME/token"
+  echo "Para que esse script funcione"
+  echo 'Ex: cat $HOME/token'
+  echo 'pqamgereorppreq'
+  exit 1
 fi
 
 #Incrementa com o padrão esperado pelo GitLab
 tokenfull="Authorization: Bearer $token"
 #Diretório onde está clonado os serviços
-diretorio="$HOME/gitlab/pmid/nio/"
-diretorio2="$HOME/pmid/teste/nio/"
 tipo=nio
 #Data no formato ANO-MES-DIA-HORA-MINUTO-SEGUNDO
 data=$(date +"%Y-%m-%d-%H-%M-%S")
 
 #Função que cria a barra de progresso
 progresso() {
-    # Em segundos
-    duracao=300
-    #Intervalo de atualização em segundos
-    intervalo=1
-    # calculate the number of atualizacao needed
-    atualizacao=$(($duracao / $intervalo))
-    #Looping que monta a barra de progresso
-    for ((i = 0; i <= $atualizacao; i++)); do
-        #Calcula a porcentagem de concluída
-        porcentagem=$((($i * 100 / $atualizacao)))
-        #Imprime a barra de progresso
-        printf "["
-        for ((j = 0; j < $porcentagem / 2; j++)); do
-            printf "#"
-        done
-        for ((j = $porcentagem / 2; j < 50; j++)); do
-            printf " "
-        done
-        printf "] %d%%\r" $porcentagem
-        #Espera o tempo de atualização
-        sleep $intervalo
+  # Em segundos
+  duracao=300
+  #Intervalo de atualização em segundos
+  intervalo=1
+  # calculate the number of atualizacao needed
+  atualizacao=$(($duracao / $intervalo))
+  #Looping que monta a barra de progresso
+  for ((i = 0; i <= $atualizacao; i++)); do
+    #Calcula a porcentagem de concluída
+    porcentagem=$((($i * 100 / $atualizacao)))
+    #Imprime a barra de progresso
+    printf "["
+    for ((j = 0; j < $porcentagem / 2; j++)); do
+      printf "#"
     done
-    #Imprime uma nova linha
-    echo ""
+    for ((j = $porcentagem / 2; j < 50; j++)); do
+      printf " "
+    done
+    printf "] %d%%\r" $porcentagem
+    #Espera o tempo de atualização
+    sleep $intervalo
+  done
+  #Imprime uma nova linha
+  echo ""
 }
 
 #Função do DE PARA - Coleta o que vai ser alterado e para o que vai ser alterado e o número da INF
 de_para() {
-    echo Alteracao de para:
-    read -p "De: " de
-    read -p "Para: " para
-    read -p "Numero da INF: " inf
-    filtro=$de
+  echo Alteracao de para:
+  read -p "De: " de
+  read -p "Para: " para
+  read -p "Numero da INF: " inf
+  filtro=$de
 }
 
 #Função do DE PARA, que faz as alterações
 de_para1() {
-    #Faz as alterações nos envs
-    if [[ $envn != "" && -e $envn ]]; then
-        changes=$(sed -i "s/$de/$para/g w /dev/stdout" $envn)
-    elif [[ $envm != "" && -e $envm ]]; then
-        changes=$(sed -i "s/$de/$para/g w /dev/stdout" $envm)
+  #Faz as alterações nos envs
+  if [[ $envn != "" && -e $envn ]]; then
+    changes=$(sed -i "s/$de/$para/g w /dev/stdout" $envn)
+  elif [[ $envm != "" && -e $envm ]]; then
+    changes=$(sed -i "s/$de/$para/g w /dev/stdout" $envm)
+  else
+    arquivos=($(ls .env.* | grep -v -E '.env.green|.env.dev|.env.prd|.env.m-prd|.env.st|m-*'))
+    if [[ "${arquivos[@]}" != "" ]]; then
+      changes=$(sed -i "s/$de/$para/g w /dev/stdout" ${arquivos[@]})
     else
-        arquivos=($(ls .env.* | grep -v -E '.env.green|.env.dev|.env.prd|.env.m-prd|.env.st|m-*'))
-        if [[ "${arquivos[@]}" != "" ]]; then
-            changes=$(sed -i "s/$de/$para/g w /dev/stdout" ${arquivos[@]})
-        else
-            arquivos=($(ls .env.* | grep -v -E '.env.green|.env.dev|.env.prd|.env.m-prd|.env.st'))
-            if [[ "${arquivos[@]}" != "" ]]; then
-                changes=$(sed -i "s/$de/$para/g w /dev/stdout" ${arquivos[@]})
-            fi
-        fi
+      arquivos=($(ls .env.* | grep -v -E '.env.green|.env.dev|.env.prd|.env.m-prd|.env.st'))
+      if [[ "${arquivos[@]}" != "" ]]; then
+        changes=$(sed -i "s/$de/$para/g w /dev/stdout" ${arquivos[@]})
+      fi
     fi
-    #Valida se os arquivos foram alterados, ou seja se a string $de existe dentro do arquivo
-    if [[ "$changes" != "" ]]; then
-        #Se sim imprime na tela e no arquivo de saida que fica no HOME do seu usuário o nome do serviço
-        echo "Servico ${pmid[$i]}" | tee -a "$HOME"/INF_"$inf"_"$data"
-        #Imprime na tela e no arquivo de saida o DE PARA que foi feito
-        echo "De: $de Para: $para" | tee -a "$HOME"/INF_"$inf"_"$data"
-        #Imprime na tela e no arquivo de saida os arquivos env que foram alterados
-        echo Arquivos alterados | tee -a "$HOME"/INF_"$inf"_"$data"
-        alterados[$i]=$(git diff --name-only)
-        git diff --name-only | tee -a "$HOME"/INF_"$inf"_"$data"
-        #Pega a última tag do serviço
-        ultima_tag[$i]=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
-        #Imprime na tela e no arquivo de saida a última tag do serviço
-        echo Ultima tag local ${ultima_tag[$i]} | tee -a "$HOME"/INF_"$inf"_"$data"
-        #Incrementa 1 ao valor da tag - Ex: Para tag 1.0.0.0 o valor será 1.0.0.1
-        tag_mais_um=$(echo ${ultima_tag[$i]} | awk -F '.' '{print $4+1}')
-        nova_tag[$i]=$(echo ${ultima_tag[$i]} | sed "s/\.[0-9]*$/.$tag_mais_um/")
-        #Imprime na tela e no arquivo de saida a nova tag do serviço
-        echo Tag gerada "${nova_tag[$i]}" | tee -a "$HOME"/INF_"$inf"_"$data"
-        #Faz os commits gera a nova tag e envia tudo para o GitLab
-        git add .
-        git commit -m "INF $inf" >/dev/null
-        git push -q >/dev/null
-        git tag "${nova_tag[$i]}"
-        git push -q --tags >/dev/null
-        servicoalt[$i]="${pmid[$i]}"
-    fi
+  fi
+  #Valida se os arquivos foram alterados, ou seja se a string $de existe dentro do arquivo
+  if [[ "$changes" != "" ]]; then
+    #Se sim imprime na tela e no arquivo de saida que fica no HOME do seu usuário o nome do serviço
+    echo "Servico ${pmid[$i]}" | tee -a "$HOME"/INF_"$inf"_"$data"
+    #Imprime na tela e no arquivo de saida o DE PARA que foi feito
+    echo "De: $de Para: $para" | tee -a "$HOME"/INF_"$inf"_"$data"
+    #Imprime na tela e no arquivo de saida os arquivos env que foram alterados
+    echo Arquivos alterados | tee -a "$HOME"/INF_"$inf"_"$data"
+    alterados[$i]=$(git diff --name-only)
+    git diff --name-only | tee -a "$HOME"/INF_"$inf"_"$data"
+    #Pega a última tag do serviço
+    ultima_tag[$i]=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+    #Imprime na tela e no arquivo de saida a última tag do serviço
+    echo Ultima tag local ${ultima_tag[$i]} | tee -a "$HOME"/INF_"$inf"_"$data"
+    #Incrementa 1 ao valor da tag - Ex: Para tag 1.0.0.0 o valor será 1.0.0.1
+    tag_mais_um=$(echo ${ultima_tag[$i]} | awk -F '.' '{print $4+1}')
+    nova_tag[$i]=$(echo ${ultima_tag[$i]} | sed "s/\.[0-9]*$/.$tag_mais_um/")
+    #Imprime na tela e no arquivo de saida a nova tag do serviço
+    echo Tag gerada "${nova_tag[$i]}" | tee -a "$HOME"/INF_"$inf"_"$data"
+    #Faz os commits gera a nova tag e envia tudo para o GitLab
+    git add .
+    git commit -m "INF $inf" >/dev/null
+    git push -q >/dev/null
+    git tag "${nova_tag[$i]}"
+    git push -q --tags >/dev/null
+    servicoalt[$i]="${pmid[$i]}"
+  fi
 }
 
 #Função que deleta o valor informado
 deleta() {
-    read -p "Informe o que eh para deletar: " deletar
-    read -p "Numero da INF: " inf
-    filtro=$deletar
-    echo "Deletando $filtro" | tee -a "$HOME"/INF_"$inf"_"$data"
+  read -p "Informe o que eh para deletar: " deletar
+  read -p "Numero da INF: " inf
+  filtro=$deletar
+  echo "Deletando $filtro" | tee -a "$HOME"/INF_"$inf"_"$data"
 }
 
 #Função que deleta o valor informado
 deleta1() {
-    arquivos=($(ls .env.* | grep -v -E '.env.dev|.env.prd|.env.m-prd|.env.st|m-*'))
+  arquivos=($(ls .env.* | grep -v -E '.env.dev|.env.prd|.env.m-prd|.env.st|m-*'))
+  if [[ "${arquivos[@]}" != "" ]]; then
+    for file in "${arquivos[@]}"; do
+      sed "/$deletar/d" -i "$file"
+    done
+  else
+    arquivos=($(ls .env.* | grep -v -E '.env.dev|.env.prd|.env.m-prd|.env.st'))
     if [[ "${arquivos[@]}" != "" ]]; then
-        for file in "${arquivos[@]}"; do
-            sed "/$deletar/d" -i "$file"
-        done
-    else
-        arquivos=($(ls .env.* | grep -v -E '.env.dev|.env.prd|.env.m-prd|.env.st'))
-        if [[ "${arquivos[@]}" != "" ]]; then
-            for file in "${arquivos[@]}"; do
-                sed "/$deletar/d" -i "$file"
-            done
-        fi
+      for file in "${arquivos[@]}"; do
+        sed "/$deletar/d" -i "$file"
+      done
     fi
-    validacao=$(git diff --name-only)
-    if [[ $validacao != "" ]]; then
-        echo "Servico ${pmid[$i]}" | tee -a "$HOME"/INF_"$inf"_"$data"
-        #Imprime na tela e no arquivo de saida os arquivos env que foram alterados
-        echo Arquivos alterados | tee -a "$HOME"/INF_"$inf"_"$data"
-        alterados[$i]=$(git diff --name-only)
-        git diff --name-only | tee -a "$HOME"/INF_"$inf"_"$data"
-        #ultima_tag[$i]=
-        #Pega a última tag do serviço
-        ultima_tag[$i]=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
-        echo Ultima tag local "${ultima_tag[$i]}" | tee -a "$HOME"/INF_"$inf"_"$data"
-        #Incrementa 1 ao valor da tag - Ex: Para tag 1.0.0.0 o valor será 1.0.0.1
-        tag_mais_um=$(echo "${ultima_tag[$i]}" | awk -F '.' '{print $4+1}')
-        nova_tag[$i]=$(echo "${ultima_tag[$i]}" | sed "s/\.[0-9]*$/.$tag_mais_um/")
-        #Imprime na tela e no arquivo de saida a nova tag do serviço
-        echo Tag gerada "${nova_tag[$i]}" | tee -a "$HOME"/INF_"$inf"_"$data"
-        #Faz os commits gera a nova tag e envia tudo para o GitLab
-        git add .
-        git commit -m "INF $inf" >/dev/null
-        git push -q >/dev/null
-        git tag "${nova_tag[$i]}"
-        git push -q --tags >/dev/null
-        servicoalt[$i]="${pmid[$i]}"
-    fi
+  fi
+  validacao=$(git diff --name-only)
+  if [[ $validacao != "" ]]; then
+    echo "Servico ${pmid[$i]}" | tee -a "$HOME"/INF_"$inf"_"$data"
+    #Imprime na tela e no arquivo de saida os arquivos env que foram alterados
+    echo Arquivos alterados | tee -a "$HOME"/INF_"$inf"_"$data"
+    alterados[$i]=$(git diff --name-only)
+    git diff --name-only | tee -a "$HOME"/INF_"$inf"_"$data"
+    #ultima_tag[$i]=
+    #Pega a última tag do serviço
+    ultima_tag[$i]=$(git tag --sort=-v:refname | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+    echo Ultima tag local "${ultima_tag[$i]}" | tee -a "$HOME"/INF_"$inf"_"$data"
+    #Incrementa 1 ao valor da tag - Ex: Para tag 1.0.0.0 o valor será 1.0.0.1
+    tag_mais_um=$(echo "${ultima_tag[$i]}" | awk -F '.' '{print $4+1}')
+    nova_tag[$i]=$(echo "${ultima_tag[$i]}" | sed "s/\.[0-9]*$/.$tag_mais_um/")
+    #Imprime na tela e no arquivo de saida a nova tag do serviço
+    echo Tag gerada "${nova_tag[$i]}" | tee -a "$HOME"/INF_"$inf"_"$data"
+    #Faz os commits gera a nova tag e envia tudo para o GitLab
+    git add .
+    git commit -m "INF $inf" >/dev/null
+    git push -q >/dev/null
+    git tag "${nova_tag[$i]}"
+    git push -q --tags >/dev/null
+    servicoalt[$i]="${pmid[$i]}"
+  fi
 }
 
 espec_env() {
-    echo Alteracao de um env especifico:
-    echo "Informe o arquivo env para ser alterado: Ex: uat prd uat2 m-uat"
-    read env
-    env=$(echo "$env" | awk '{print tolower($0)}')
-    read -p "De: " de
-    read -p "Para: " para
-    read -p "Numero da INF: " inf
-    filtro=$de
-    envn=$(sed "s/^/.env./g" <<<$env)
-    envm=$(sed "s/^/.env.m-/g" <<<$env)
+  echo Alteracao de um env especifico:
+  echo "Informe o arquivo env para ser alterado: Ex: uat prd uat2 m-uat"
+  read env
+  env=$(echo "$env" | awk '{print tolower($0)}')
+  read -p "De: " de
+  read -p "Para: " para
+  read -p "Numero da INF: " inf
+  filtro=$de
+  envn=$(sed "s/^/.env./g" <<<$env)
+  envm=$(sed "s/^/.env.m-/g" <<<$env)
 }
 
 ##Função responsável por apertar o play do deploy da pipeline
 play() {
-    id=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects?search=$servico | jq --arg tipo "$tipo" --arg servico "$servico" '.[] | select(.namespace.name == $tipo and .name == $servico) | .id')
-    pipeline=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects/$id/pipelines?per_page=300 | jq --arg versao "$versao" '.[] | select(.ref == $versao) | .id')
-    echo Pipeline gerada | tee -a "$HOME"/INF_"$inf"_"$data"
-    echo "https://gitlab.engdb.com.br/pmid/$tipo/$servico/-/pipelines/$pipeline" | tee -a "$HOME"/INF_"$inf"_"$data"
-    if [[ $resp == "s" ]]; then
-        exec=($(echo ${alterados[$i]}))
-        b=0
-        while [ $b -lt ${#exec[@]} ]; do
-            deploy=$(sed 's/.env.//g' <<<${exec[$b]})
-            job=$(curl -s --request GET --header "$tokenfull" https://gitlab.engdb.com.br/api/v4/projects/$id/pipelines/$pipeline/jobs | jq --arg deploy "$deploy" '.[] | select(.name == "deploy_'"$deploy"'_blue") | .id')
-            curl -s --request POST --header "$tokenfull" "https://gitlab.engdb.com.br/api/v4/projects/$id/jobs/$job/play" >/dev/null
-            b=$(($b + 1))
-        done
-    fi
+  if [[ $resp == "s" ]]; then
+    exec=($(echo ${alterados[@]}))
+    b=0
+    while [ $b -lt ${#exec[@]} ]; do
+      deploy=$(sed 's/.env.//g' <<<${exec[$b]})
+      tag=$(checkVersion.sh $servico $deploy | awk '{print $2}')
+      IFS='.' read -ra ver1 <<<"$tag"
+      IFS='.' read -ra ver2 <<<"$versao"
+      if [[ $tag != "instalado" ]]; then
+        if [[ "${ver1[0]}.${ver1[1]}.${ver1[2]}" == "${ver2[0]}.${ver2[1]}.${ver2[2]}" && "${ver2[3]}" -eq $((${ver1[3]} + 1)) ]]; then
+          echo "Servico $servico em $deploy versao $tag instalando a versao gerada por ser subsequente $versao" | tee -a "$HOME"/INF_"$inf"_"$data"
+          id=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects?search=$servico | jq --arg tipo "$tipo" --arg servico "$servico" '.[] | select(.namespace.name == $tipo and .name == $servico) | .id')
+          pipeline=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects/$id/pipelines?per_page=300 | jq --arg versao "$versao" '.[] | select(.ref == $versao) | .id')
+          job=$(curl -s --request GET --header "$tokenfull" https://gitlab.engdb.com.br/api/v4/projects/$id/pipelines/$pipeline/jobs | jq --arg deploy "$deploy" '.[] | select(.name == "deploy_'"$deploy"'_blue") | .id')
+          curl -s --request POST --header "$tokenfull" "https://gitlab.engdb.com.br/api/v4/projects/$id/jobs/$job/play" >/dev/null
+        else
+          echo "Servico $servico em $deploy versao $tag NAO sera instalado a versao gerada $versao por NAO ser a subsequente" | tee -a "$HOME"/INF_"$inf"_"$data"
+        fi
+      else
+        echo "Servico $servico em $deploy NAO instalado" | tee -a "$HOME"/INF_"$inf"_"$data"
+      fi
+      b=$(($b + 1))
+    done
+  fi
 }
 
 x=0
 while [ $x == "0" ]; do
-    echo "Informe o tipo de função que deseja utilizar"
-    echo "Para usar a função alteracao DE PARA informe depara"
-    echo "Para usar a função de DELETAR informe del"
-    echo "Para usar a função DE PARA, para alterar um arquivo env especifico informe esp"
-    read x
-    if [[ $x == "del" ]]; then
-        acao=deleta
-        deleta
-    elif [[ $x == "depara" ]]; then
-        acao=de_para
-        de_para
-    elif [[ $x == "esp" ]]; then
-        acao=espec_env
-        espec_env
-    else
-        echo "Tente novamente"
-        x=0
-    fi
+  echo "Informe o tipo de função que deseja utilizar"
+  echo "Para usar a função alteracao DE PARA informe depara"
+  echo "Para usar a função de DELETAR informe del"
+  echo "Para usar a função DE PARA, para alterar um arquivo env especifico informe esp"
+  read x
+  if [[ $x == "del" ]]; then
+    acao=deleta
+    deleta
+  elif [[ $x == "depara" ]]; then
+    acao=de_para
+    de_para
+  elif [[ $x == "esp" ]]; then
+    acao=espec_env
+    espec_env
+  else
+    echo "Tente novamente"
+    x=0
+  fi
 done
 
 pid=$(ps -ef | grep agent | grep -v grep | awk '{print $2}')
 if [[ $pid == "" ]]; then
-    echo "Informe a senha da chave SSH"
-    eval $(keychain --eval id_rsa)
+  echo "Informe a senha da chave SSH"
+  eval $(keychain --eval id_rsa)
 else
-    eval $(keychain --eval id_rsa)
+  eval $(keychain --eval id_rsa)
 fi
 
 if [[ "$1" == "teste" ]]; then
-    diretorio="$HOME/pmid/teste/nio/"
-    pmid=($(grep -Rl $filtro $diretorio | cut -d\/ -f7 | sort -u))
+  diretorio="$HOME/pmid/teste/nio/"
+  pmid=($(grep -Rl $filtro $diretorio | cut -d\/ -f7 | sort -u))
+  echo $diretorio
 else
-    diretorio="$HOME/gitlab/pmid/nio/"
-    pmid=($(grep -Rl $filtro $diretorio | cut -d\/ -f7 | sort -u | grep -v teste))
+  diretorio="$HOME/gitlab/pmid/nio/"
+  pmid=($(grep -Rl $filtro $diretorio | cut -d\/ -f7 | sort -u | grep -v teste))
+  echo $diretorio
 fi
 
 ultima_tag=()
@@ -229,28 +239,28 @@ servicoalt=()
 #Primeiro loop. Verifica o que tem que ser alterado e altera.
 i=0
 while [ $i -lt ${#pmid[@]} ]; do
-    cd $diretorio${pmid[$i]}
-    git pull >/dev/null
-    if [[ "$acao" == "de_para" ]]; then
-        de_para1
-    elif [[ "$acao" == "deleta" ]]; then
-        deleta1
-    elif [[ "$acao" == "espec_env" ]]; then
-        de_para1
-    fi
-    i=$(($i + 1))
+  cd $diretorio${pmid[$i]}
+  git pull >/dev/null
+  if [[ "$acao" == "de_para" ]]; then
+    de_para1
+  elif [[ "$acao" == "deleta" ]]; then
+    deleta1
+  elif [[ "$acao" == "espec_env" ]]; then
+    de_para1
+  fi
+  i=$(($i + 1))
 done
 
 #Valida se pelo menos um serviço foi alterado caso contrário finaliza a execução e retorna a mensagem do echo
 if [[ ${servicoalt[0]} != "" ]]; then
-    echo "Aguarde 5 minutos, enquanto as pipelines são geradas"
-    progresso
-    echo "Deseja que as instalações sejam feitas de maneira automática ? s para sim ou n para não"
-    echo "Caso responda n será necessário entrar nos links de todas as pipelines que eu informar e instalar manualmente"
-    read resp
+  echo "Aguarde 5 minutos, enquanto as pipelines são geradas"
+  progresso
+  echo "Deseja que as instalações sejam feitas de maneira automática ? s para sim ou n para não"
+  echo "Caso responda n será necessário entrar nos links de todas as pipelines que eu informar e instalar manualmente"
+  read resp
 else
-    echo "Nada foi alterado pois nao foi encontrado o dado informado"
-    exit 1
+  echo "Nada foi alterado pois nao foi encontrado o dado informado"
+  exit 1
 fi
 
 #Segundo loop. Responsável por apertar o play ou seja fazer a instalação a partir do env que foi alterado
@@ -258,10 +268,10 @@ fi
 #Caso seja o .env.m-uat o play será dado no deploy_m-uat_blue
 i=0
 while [ $i -lt ${#servicoalt[@]} ]; do
-    servico="${servicoalt[$i]}"
-    versao="${nova_tag[$i]}"
-    play
-    i=$(($i + 1))
+  servico="${servicoalt[$i]}"
+  versao="${nova_tag[$i]}"
+  play
+  i=$(($i + 1))
 done
 
 echo "Caso precise o arquivo do log ""$HOME""/INF_""$inf""_""$data"""
