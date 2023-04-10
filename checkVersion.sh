@@ -39,7 +39,7 @@ if echo "$pod" | grep -q "gmid-"; then
   id=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects?search=$servico | jq --arg tipo "$tipo" --arg servico "$servico" '.[] | select(.namespace.full_path == $tipo and .name == $servico) | .id')
   versao=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects/$id/pipelines?per_page=300 | jq --arg versao "$versao" '.[] | select(.id == ($versao | tonumber)) | .ref' --raw-output)
   pipeline=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects/$id/pipelines?per_page=300 | jq --arg versao "$versao" '.[] | select(.ref == $versao) | .id')
-  echo -e "$pod $namespace $versao pipeline: https://gitlab.engdb.com.br/gmid/$tipo/$servico/-/pipelines/$pipeline"
+  echo -e "$pod $namespace $versao pipeline: https://gitlab.engdb.com.br/$tipo/$servico/-/pipelines/$pipeline"
   exit 0
 else
   checkVersion >/dev/null
