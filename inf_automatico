@@ -110,13 +110,13 @@ deleta() {
 
 #Função que deleta o valor informado
 deleta1() {
-    arquivos=($(ls .env.* | grep -v -E '.env.dev|.env.prd|.env.m-prd|.env.st|m-*'))
+    arquivos=($(ls .env.* | grep -v -E '.env.green|.env.dev|.env.prd|.env.m-prd|.env.st|m-*'))
     if [[ "${arquivos[@]}" != "" ]]; then
         for file in "${arquivos[@]}"; do
             sed "/$deletar/d" -i "$file"
         done
     else
-        arquivos=($(ls .env.* | grep -v -E '.env.dev|.env.prd|.env.m-prd|.env.st'))
+        arquivos=($(ls .env.* | grep -v -E '.env.green|.env.dev|.env.prd|.env.m-prd|.env.st'))
         if [[ "${arquivos[@]}" != "" ]]; then
             for file in "${arquivos[@]}"; do
                 sed "/$deletar/d" -i "$file"
