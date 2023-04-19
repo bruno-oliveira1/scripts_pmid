@@ -1,65 +1,115 @@
 #!/bin/bash
 token=$(cat $HOME/token 2>/dev/null)
 if [[ $token == "" ]]; then
-    echo "Eh necessario ter um token criado no GitLab que o mesmo esteja dentro do arquivo $HOME/token"
-    echo "Para que esse script funcione"
-    echo 'Ex: cat $HOME/token'
-    echo 'pqamgereorppreq'
-    exit 1
+	echo "Eh necessario ter um token criado no GitLab que o mesmo esteja dentro do arquivo $HOME/token"
+	echo "Para que esse script funcione"
+	echo 'Ex: cat $HOME/token'
+	echo 'pqamgereorppreq'
+	exit 1
 fi
 
 tokenfull="Authorization: Bearer $token"
 
-todos () {
-	pag=$(curl -s --head  --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/groups/"${id[$int]}"/projects?per_page=100 | awk -F "x-total-pages: " '{print $2}' | awk NF | sed 's/\r//')
+todos() {
+	pag=$(curl -s --head --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/groups/"${id[$int]}"/projects?per_page=100 | awk -F "x-total-pages: " '{print $2}' | awk NF | sed 's/\r//')
 	i=1
 	r=0
-	while [ $i -le $pag ]
-	do
-		#repos=( $(curl -s  --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/groups/"${id[$int]}"/projects\?per_page=100\&page=$i |  jq '.[].http_url_to_repo' | sed 's/"//g'| sed "s/gitlab/$token:$token@gitlab/" ) )
-		repos=( $(curl -s  --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/groups/"${id[$int]}"/projects\?per_page=100\&page=$i |  jq '.[].ssh_url_to_repo' | sed 's/"//g' ) )
-		while [ $r -lt ${#repos[@]} ]
-		do
-		if [ -d $HOME/gitlab/"${nomegitlab[$index]}"/"${projetos[$int]}"/$( cut -d/ -f3 <<< ${repos[$r]} | sed 's/.git//g' ) ]; then
-		echo "  Atualizando arquivos locais do serviço $(cut -d/ -f3 <<< ${repos[$r]} | sed 's/.git//g')"
-		git -C $HOME/gitlab/"${nomegitlab[$index]}"/"${projetos[$int]}"/$( cut -d/ -f3 <<< ${repos[$r]} | sed 's/.git//g' ) pull -q
-		else
-		echo "  Clonando serviço $(cut -d/ -f3 <<< ${repos[$r]} | sed 's/.git//g') "
-		git clone -q ${repos[$r]} $HOME/gitlab/"${nomegitlab[$index]}"/"${projetos[$int]}"/$( cut -d/ -f3 <<< ${repos[$r]} | sed 's/.git//g' )
-		fi
-		r=$(( $r + 1 ))
+	while [ $i -le $pag ]; do
+		repos=($(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/groups/"${id[$int]}"/projects\?per_page=100\&page=$i | jq '.[].ssh_url_to_repo' | sed 's/"//g'))
+		while [ $r -lt ${#repos[@]} ]; do
+			if [ -d $HOME/gitlab/$(cut -d: -f2 <<<${repos[$r]} | sed 's/.git//g') ]; then
+				echo "  Atualizando arquivos locais do serviço $(cut -d/ -f3 <<<${repos[$r]} | sed 's/.git//g')"
+				git -C $HOME/gitlab/$(cut -d: -f2 <<<${repos[$r]} | sed 's/.git//g') pull -q
+			else
+				echo "  Clonando serviço $(cut -d/ -f3 <<<${repos[$r]} | sed 's/.git//g') "
+				git clone -q ${repos[$r]} $HOME/gitlab/$(cut -d: -f2 <<<${repos[$r]} | sed 's/.git//g')
+			fi
+			r=$(($r + 1))
 		done
-		i=$(( $i + 1 ))
+		i=$(($i + 1))
 		r=0
 	done
 }
 
-clone () {
-int=0
-while [ $int -lt ${#projetos[@]} ]
-do
-if [ -d $HOME/gitlab/"${nomegitlab[$int]}"/"${projetos[$int]}" ]; then
-echo " Projeto ${projetos[$int]} já clonado"
-todos
-else
-echo "  Clonando projeto ${projetos[$int]}"
-todos
-fi
-int=$(( $int + 1 ))
-done
+clone() {
+	int=0
+	while [ $int -lt ${#projetos[@]} ]; do
+		if [ -d $HOME/gitlab/"${nomegitlab[$index]}"/"${projetos[$int]}" ]; then
+			echo " Projeto ${projetos[$int]} já clonado"
+			todos
+		else
+			echo "  Clonando projeto ${projetos[$int]}"
+			todos
+		fi
+		int=$(($int + 1))
+	done
 }
 
-#386 = https://gitlab.engdb.com.br/pmid 
-#828 = https://gitlab.engdb.com.br/gmid 
+todossub() {
+	pag=$(curl -s --head --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/groups/"${idsub[$int]}"/projects?per_page=100 | awk -F "x-total-pages: " '{print $2}' | awk NF | sed 's/\r//')
+	i=1
+	r=0
+	while [ $i -le $pag ]; do
+		repos=($(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/groups/"${idsub[$int]}"/projects\?per_page=100\&page=$i | jq '.[].ssh_url_to_repo' | sed 's/"//g'))
+		while [ $r -lt ${#repos[@]} ]; do
+			if [ -d $HOME/gitlab/$(cut -d: -f2 <<<${repos[$r]} | sed 's/.git//g') ]; then
+				echo "  Atualizando arquivos locais do serviço $(cut -d: -f2 <<<${repos[$r]} | sed 's/.git//g')"
+				git -C $HOME/gitlab/$(cut -d: -f2 <<<${repos[$r]} | sed 's/.git//g') pull -q
+			else
+				echo "  Clonando serviço $(cut -d: -f2 <<<${repos[$r]} | sed 's/.git//g') "
+				git clone -q ${repos[$r]} $HOME/gitlab/$(cut -d: -f2 <<<${repos[$r]} | sed 's/.git//g')
+			fi
+			r=$(($r + 1))
+		done
+		i=$(($i + 1))
+		r=0
+	done
+}
+
+clonesub() {
+	int=0
+	while [ $int -lt ${#projetossub[@]} ]; do
+		if [ -d $HOME/gitlab/"${nomegitlab[$index]}"/"${projetossub[$int]}" ]; then
+			echo " Projeto ${projetossub[$int]} já clonado"
+			todossub
+		else
+			echo "  Clonando projeto ${projetossub[$int]}"
+			todossub
+		fi
+		int=$(($int + 1))
+	done
+}
+
+#386 = https://gitlab.engdb.com.br/pmid
+#828 = https://gitlab.engdb.com.br/gmid
 idgitlab=(386 828)
 nomegitlab=(pmid gmid)
 
 index=0
 
-while [ $index -le ${#idgitlab} ]
-do
-projetos=( $(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/groups/"${idgitlab[$index]}"/subgroups |  jq '.[].name'  | sed 's/"//g') )
-id=( $(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/groups/"${idgitlab[$index]}"/subgroups |  jq '.[].id'  | sed 's/"//g') ) 
-clone
-index=$(( $index + 1 ))
+while [ $index -le ${#idgitlab} ]; do
+	projetos=($(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/groups/"${idgitlab[$index]}"/subgroups | jq '.[].name' | sed 's/"//g'))
+	id=($(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/groups/"${idgitlab[$index]}"/subgroups | jq '.[].id' | sed 's/"//g'))
+	clone
+	index=$(($index + 1))
+done
+
+index=0
+for index in "${!idgitlab[@]}"; do
+	projetos=($(curl -s --header "$tokenfull" -X GET "https://gitlab.engdb.com.br/api/v4/groups/${idgitlab[$index]}/subgroups" | jq -r '.[].name'))
+	id=($(curl -s --header "$tokenfull" -X GET "https://gitlab.engdb.com.br/api/v4/groups/${idgitlab[$index]}/subgroups" | jq -r '.[].id'))
+
+	b=0
+	while [ $b -lt ${#id[@]} ]; do
+		projetossub=($(curl -s --header "$tokenfull" -X GET "https://gitlab.engdb.com.br/api/v4/groups/${id[$b]}/subgroups" | jq -r '.[].name'))
+		idsub=($(curl -s --header "$tokenfull" -X GET "https://gitlab.engdb.com.br/api/v4/groups/${id[$b]}/subgroups" | jq -r '.[].id'))
+
+		c=0
+		while [ $c -lt ${#idsub[@]} ]; do
+			clonesub
+			c=$((c + 1))
+		done
+
+		b=$((b + 1))
+	done
 done
