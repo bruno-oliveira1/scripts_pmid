@@ -38,5 +38,4 @@ if [ -f "$zip" ]; then
 fi
 
 echo "Compactando"
-zip="$(sed 's/portabilidade\///g' <<< $destino)portabilidade.zip"
 7z a -tzip -mx=5 $zip $destino
