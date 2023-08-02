@@ -1,16 +1,19 @@
 #!/bin/bash
-read -p "Qual ambiente seja pegar | UAT digite fqa ou PROD digite prd  " ambiente
+read -p "Qual ambiente deseja pegar os logs | UAT digite fqa ou PROD digite prd  " ambiente
 changeEnv.sh $ambiente
 usuario=$(cmd.exe /c echo %homepath% 2> /dev/null | sed 's/\\/\//g' | awk '{ sub("\r$", ""); print }')
 disco="/mnt/c"
 destino="$disco$usuario/Downloads/portabilidade/"
 
+#Se o diretorio nao existir ele sera criado
 if [ ! -d "$destino" ]; then
 	mkdir -p $destino
 else
+	#Se já existir seu conteúdo será removido
 	rm -rf $destino*
 fi
 
+#Verifica se o 7zip está instalado senao estiver instala
 if ! command -v "7z" &>/dev/null; then
     echo "Instalando '7zip'..."
         sudo apt update
@@ -27,11 +30,13 @@ kubectl cp s-$ambiente/$(getPods.sh consumer-events-portability $ambiente | grep
 echo "Apagando arquivos vazios"
 find $destino -type f -size 0 -exec rm {} \;
 
-echo "Compactando"
-
 zip="$(sed 's/portabilidade\///g' <<< $destino)portabilidade.zip"
 
+#Se o arquivo compactado já existir ele será removido 
 if [ -f "$zip" ]; then
 	rm -rf $zip 
 fi
+
+echo "Compactando"
+zip="$(sed 's/portabilidade\///g' <<< $destino)portabilidade.zip"
 7z a -tzip -mx=5 $zip $destino
