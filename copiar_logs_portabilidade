@@ -1,0 +1,37 @@
+#!/bin/bash
+read -p "Qual ambiente seja pegar | UAT digite fqa ou PROD digite prd  " ambiente
+changeEnv.sh $ambiente
+usuario=$(cmd.exe /c echo %homepath% 2> /dev/null | sed 's/\\/\//g' | awk '{ sub("\r$", ""); print }')
+disco="/mnt/c"
+destino="$disco$usuario/Downloads/portabilidade/"
+
+if [ ! -d "$destino" ]; then
+	mkdir -p $destino
+else
+	rm -rf $destino*
+fi
+
+if ! command -v "7z" &>/dev/null; then
+    echo "Instalando '7zip'..."
+        sudo apt update
+        sudo apt install -y "p7zip-full"
+fi
+
+if [ $ambiente == "fqa"  ]; then 
+	ambiente=uat
+fi
+
+echo "Copiando arquivos"
+kubectl cp s-$ambiente/$(getPods.sh consumer-events-portability $ambiente | grep -i running | awk '{print $2}'):/tmp/kafka-portability/ $destino > /dev/null
+
+echo "Apagando arquivos vazios"
+find $destino -type f -size 0 -exec rm {} \;
+
+echo "Compactando"
+
+zip="$(sed 's/portabilidade\///g' <<< $destino)portabilidade.zip"
+
+if [ -f "$zip" ]; then
+	rm -rf $zip 
+fi
+7z a -tzip -mx=5 $zip $destino
