@@ -33,14 +33,15 @@ na_namespace="$namespace"
 
 if echo "$pod" | grep -q "gmid-"; then
   tipo="gmid/services"
-  servico=${pod/gmid-/}
+  #servico=${pod/gmid-/}
   namespace="m-$na_namespace"
   versao=$(kubectl -n $namespace describe deploy $pod 2>/dev/null | grep -i Image | sed 's/.*pipeline-//')
+  servico=$(kubectl -n $namespace describe deploy $pod 2>/dev/null | grep -i Image | awk -F\/ '{print $5}' | awk -F\: '{print $1}')
   if [[ $versao != "naoinstalado" && $versao != "" ]]; then
     id=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects?search=$servico | jq --arg tipo "$tipo" --arg servico "$servico" '.[] | select(.namespace.full_path == $tipo and .name == $servico) | .id')
     versao=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects/$id/pipelines?per_page=300 | jq --arg versao "$versao" '.[] | select(.id == ($versao | tonumber)) | .ref' --raw-output)
     pipeline=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects/$id/pipelines?per_page=300 | jq --arg versao "$versao" '.[] | select(.ref == $versao) | .id')
-    echo -e "$pod $namespace $versao pipeline: https://gitlab.engdb.com.br/$tipo/$servico/-/pipelines/$pipeline"
+    echo -e "$pod $versao $namespace pipeline: https://gitlab.engdb.com.br/$tipo/$servico/-/pipelines/$pipeline"
     exit 0
   else
     echo -e "Nao instalado"
@@ -53,8 +54,7 @@ elif echo "$pod" | grep -q "rules-"; then
   id=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects?search=$servico | jq --arg tipo "$tipo" --arg servico "$servico" '.[] | select(.namespace.full_path == $tipo and .name == $servico) | .id')
   if [[ $versao != "naoinstalado" && $versao != "" ]]; then
     pipeline=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects/$id/pipelines?per_page=300 | jq --arg versao "$versao" '.[] | select(.ref == $versao) | .id')
-    declare -g namespace="s-$namespace"
-    echo -e "$pod $namespace $versao pipeline: https://gitlab.engdb.com.br/$tipo/$servico/-/pipelines/$pipeline"
+    echo -e "$pod $versao $namespace pipeline: https://gitlab.engdb.com.br/$tipo/$servico/-/pipelines/$pipeline"
     exit 0
   else
     echo -e "Nao instalado"
@@ -62,7 +62,9 @@ elif echo "$pod" | grep -q "rules-"; then
 else
   versao=$(kubectl -n $namespace describe deploy $pod 2>/dev/null | grep -i Image | sed 's#.*:##')
   if [[ $versao != "naoinstalado" && $versao != "" ]]; then
-    echo -e "$pod $namespace $versao"
+    servico="$pod"
+    id=$(curl -s --header "$tokenfull" -X GET https://gitlab.engdb.com.br/api/v4/projects?search=$servico | jq --arg tipo "$tipo" --arg servico "$servico" '.[] | select(.namespace.full_path == $tipo and .name == $servico) | .id')
+    echo -e "$pod $versao $namespace"
   else
     echo -e "Nao instalado"
   fi
