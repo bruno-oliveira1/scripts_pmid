@@ -4,12 +4,13 @@ arquivo=( $(cat $HOME/lista.txt) )
 cont=0
 
 dir="$HOME/gitlab/pmid/nio"
-dir2="$HOME/gitlab/pmid/microservice"
+#dir2="$HOME/gitlab/pmid/microservice"
 kubectl get pods -A -o json > $HOME/pods_json
 echo "servico ; filtro ; rota" | tee $HOME/servicos_kong.csv
 while [ $cont -lt ${#arquivo[@]} ]; do
-        var=$(grep kong "$dir/${arquivo[$cont]}/resources/application.properties" 2> /dev/null || grep kong "$dir2/${arquivo[$cont]}/script.sh" 2> /dev/null )
-        var=$(echo "${var%%$'\n'*}")
+        var=$(grep kong "$dir/${arquivo[$cont]}/resources/application.properties" | head -n1)
+        # || grep kong "$dir2/${arquivo[$cont]}/script.sh" 2> /dev/null )
+        #var=$(echo "${var%%$'\n'*}")
         teste=$(jq -r '.items[] | "\(.metadata.name) \(.metadata.namespace)"' $HOME/pods_json | grep ^"${arquivo[$cont]}")
         controle=$(echo $teste | grep -vE 'd-prd|m-prd')
         if [[ -z $controle ]]; then 
@@ -18,9 +19,12 @@ while [ $cont -lt ${#arquivo[@]} ]; do
             else 
             echo "${arquivo[$cont]} ; dupla convivencia ; tem exposicao" | tee -a $HOME/servicos_kong.csv 
             fi
-        else
-        echo "${arquivo[$cont]} ; existe somente em prd ; tem exposicao" | tee -a $HOME/servicos_kong.csv
-        #echo "$controle"
+        elif [[ ! -z $controle ]]; then
+            if [ -z $var ]; then
+            echo "${arquivo[$cont]} ; existe somente em prd ; nao tem exposicao" | tee -a $HOME/servicos_kong.csv
+            else 
+            echo "${arquivo[$cont]} ; existe somente em prd ; tem exposicao" | tee -a $HOME/servicos_kong.csv
+            fi
         fi
         cont=$(($cont + 1))
 done
